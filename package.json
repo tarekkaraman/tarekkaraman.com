@@ -1,0 +1,15 @@
+{
+  "name": "tarek-cv",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --port 5350 --host 127.0.0.1",
+    "build": "vite build",
+    "preview": "vite preview --port 5351",
+    "vault": "node scripts/encrypt-vault.mjs"
+  },
+  "devDependencies": {
+    "vite": "^5.4.11"
+  }
+}

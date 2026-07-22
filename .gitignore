@@ -1,0 +1,9 @@
+node_modules/
+dist/
+.DS_Store
+
+# Confidential — never commit
+private/
+.vault-pass
+.env
+.env.*
