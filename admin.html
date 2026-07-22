@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CMS — Tarek Karaman site</title>
+  <meta name="robots" content="noindex" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%232563eb'/><text x='50' y='68' font-size='44' font-family='Georgia' fill='white' text-anchor='middle'>✎</text></svg>" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,400;9..144,600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/src/styles.css" />
+  <link rel="stylesheet" href="/src/admin.css" />
+</head>
+<body class="admin">
+  <!-- Gate -->
+  <div id="gate" class="gate">
+    <div class="gate-card">
+      <h1>Site CMS</h1>
+      <p>Enter your editor key to manage the site content.</p>
+      <form id="gate-form">
+        <input id="gate-key" type="password" placeholder="Editor key" autocomplete="off" />
+        <button class="btn btn-primary" type="submit">Enter</button>
+      </form>
+      <p class="gate-msg" id="gate-msg"></p>
+      <p class="gate-hint">On the live Cloudflare site this must match your <code>ADMIN_KEY</code>. On preview/static hosting it just unlocks the editor locally.</p>
+    </div>
+  </div>
+
+  <!-- App -->
+  <div id="app" hidden>
+    <header class="admin-top">
+      <b>TK site · CMS</b>
+      <span class="mode-pill" id="mode-pill">detecting…</span>
+      <div class="admin-tabs">
+        <button class="tab on" data-tab="content">Content</button>
+        <button class="tab" data-tab="private">Deeper Dive</button>
+        <button class="tab" data-tab="publish">Publish</button>
+      </div>
+      <div class="admin-actions">
+        <button class="btn btn-ghost" id="preview-btn">Preview ↗</button>
+        <button class="btn btn-primary" id="savedraft-btn">Save draft</button>
+      </div>
+    </header>
+
+    <main class="admin-main">
+      <section class="panel" id="tab-content"></section>
+      <section class="panel" id="tab-private" hidden></section>
+      <section class="panel" id="tab-publish" hidden>
+        <h2>Publish</h2>
+        <p id="publish-status" class="pub-status"></p>
+        <div class="pub-row">
+          <button class="btn btn-primary" id="publish-live">Publish live</button>
+          <button class="btn btn-ghost" id="download-content">Download content.json</button>
+          <button class="btn btn-ghost" id="download-vault">Download vault.enc.json</button>
+        </div>
+        <p id="publish-msg" class="pub-msg"></p>
+        <div class="pub-help" id="pub-help"></div>
+      </section>
+    </main>
+  </div>
+
+  <script type="module" src="/src/admin.js"></script>
+</body>
+</html>

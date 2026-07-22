@@ -21,18 +21,23 @@ git checkout dev     # work on dev branch
 git checkout main && git merge dev && git push   # deploys prod
 ```
 
-## Editing content
+## Editing content — two ways
 
-- **Everything public**: `src/data/profile.js` — single source of truth (page, chat, palette and terminal all render from it).
-- **Confidential vault**: `private/vault-content.json` (gitignored, never leaves this machine in plain text). After editing run:
+**1. The CMS (no code)** — open `/admin.html` on the site (or ⌘K → "Open the CMS").
+Edit everything (basics, stats, experience, skills, philosophy, LinkedIn pulse, deep
+knowledge, and the encrypted Deeper Dive), preview, then publish. See `DEPLOY.md`.
 
-```bash
-npm run vault
-```
+**2. In code** — `src/data/profile.js` is the default/seed content (same shape the CMS
+edits). The page, chat, palette and terminal all render from the resolved content.
 
-- **Access key**: stored in `.vault-pass` (gitignored). To change it, edit `.vault-pass` and run `npm run vault` again.
+Content resolution order at runtime: `/api/content` (Cloudflare KV, live CMS) →
+`public/content.json` (CMS "publish" on GitHub Pages) → bundled `profile.js`.
+
+- **Deeper Dive (private)**: edit in the CMS, or `private/vault-content.json` (gitignored)
+  + `npm run vault`. Access key lives in `.vault-pass` (gitignored). AES-256-GCM encrypted.
+- **Voice intro**: drop an mp3 at `public/voice-intro.mp3` and set `voiceIntro` (in the CMS
+  or profile.js) to `./voice-intro.mp3` — the hero play button appears automatically.
 - **CV PDF**: replace `public/Tarek_Karaman_CV.pdf`.
-- **LinkedIn pulse**: update `linkedinPulse` in `src/data/profile.js` when you post.
 
 ## The AI concierge
 

@@ -1,14 +1,15 @@
 <!doctype html>
-<html lang="en" data-theme="dark">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Tarek Karaman — AI & Digital Transformation Leader</title>
   <meta name="description" content="Tarek Karaman — AI & Digital Transformation Leader. 25+ years delivering enterprise-scale innovation. Head of AI, WSP Middle East. Ask my AI anything." />
+  <meta name="theme-color" content="#ffffff" />
   <meta property="og:title" content="Tarek Karaman — AI & Digital Transformation Leader" />
   <meta property="og:description" content="25+ years of enterprise AI & digital transformation. Explore the interactive CV — or just ask the AI." />
   <meta property="og:type" content="profile" />
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230b1020'/><text x='50' y='68' font-size='48' font-family='Georgia' fill='%23e8c47c' text-anchor='middle'>TK</text></svg>" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='%232563eb'/><stop offset='.5' stop-color='%236d5cff'/><stop offset='1' stop-color='%2306b6d4'/></linearGradient></defs><rect width='100' height='100' rx='22' fill='url(%23g)'/><text x='50' y='68' font-size='46' font-family='Georgia' fill='white' text-anchor='middle'>TK</text></svg>" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,600&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
@@ -25,11 +26,12 @@
         <a href="#concierge">Ask my AI</a>
         <a href="#journey">Journey</a>
         <a href="#leadership">Leadership</a>
-        <a href="#vault-section">Confidential</a>
+        <a href="#pulse">Pulse</a>
+        <a href="#vault-section">Deeper Dive</a>
         <a href="#contact">Contact</a>
       </nav>
       <div class="topbar-actions">
-        <button class="chip" id="recruiter-toggle" title="Condensed 90-second view for recruiters">Recruiter mode</button>
+        <button class="chip" id="recruiter-toggle" title="Condensed 90-second view">Quick view</button>
         <button class="iconbtn" id="palette-btn" title="Command palette (⌘K)">⌘K</button>
         <button class="iconbtn" id="theme-btn" title="Toggle theme" aria-label="Toggle theme">◐</button>
       </div>
@@ -37,23 +39,28 @@
   </header>
 
   <main id="top">
-    <!-- ── Hero ─────────────────────────────────── -->
+    <!-- ── Hero ── -->
     <section class="hero" id="hero">
+      <div class="hero-grid" aria-hidden="true"></div>
+      <div class="hero-mesh" aria-hidden="true"></div>
       <div class="hero-inner">
-        <p class="hero-kicker reveal">Dubai, UAE · British National · Open to CTO / Chief AI Officer mandates</p>
+        <p class="hero-kicker reveal"><span class="dot"></span> AI &amp; Digital Transformation · Dubai, UAE</p>
         <h1 class="hero-name reveal">Tarek Karaman</h1>
-        <p class="hero-headline reveal">I build <em>enterprise AI capability</em> from the ground up —<br class="wide-only" /> strategy, delivery organisations, and adoption at scale.</p>
-        <p class="hero-sub reveal">25+ years across government, infrastructure and Fortune 500. Currently leading AI for WSP across the Middle East &amp; Africa. This site is itself a working demonstration: an AI concierge below is trained on my career and will answer your questions honestly — and it knows what it isn't allowed to say.</p>
+        <p class="hero-headline reveal">I build <em class="grad-text">enterprise AI capability</em> from the ground up —<br class="wide-only" /> strategy, delivery organisations, and adoption at scale.</p>
+        <p class="hero-sub reveal">25+ years across government, infrastructure and Fortune 500. Currently leading AI for WSP across the Middle East &amp; Africa. This site is itself a working demonstration: the AI concierge below is trained on my career and answers honestly — and knows what it isn't allowed to say.</p>
         <div class="hero-ctas reveal">
           <button class="btn btn-primary" data-open-chat>Ask my AI ✦</button>
-          <a class="btn btn-ghost" href="./Tarek_Karaman_CV.pdf" download>Download CV (PDF)</a>
-          <a class="btn btn-ghost" href="#vault-section">🔒 Confidential access</a>
+          <a class="btn btn-ghost" href="./Tarek_Karaman_CV.pdf" download>Download CV</a>
+          <button class="voice-btn" id="voice-btn" hidden>
+            <span class="ico" id="voice-ico">▶</span>
+            <span class="bars" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+            <span id="voice-label">Hear a 60-second intro</span>
+          </button>
         </div>
       </div>
-      <div class="hero-glow" aria-hidden="true"></div>
     </section>
 
-    <!-- ── Executive scorecard ──────────────────── -->
+    <!-- ── Executive scorecard ── -->
     <section class="section" id="scorecard">
       <h2 class="section-title"><span>01</span> Executive scorecard</h2>
       <div class="stats-grid" id="stats-grid"></div>
@@ -63,10 +70,10 @@
       </div>
     </section>
 
-    <!-- ── AI concierge ─────────────────────────── -->
+    <!-- ── AI concierge ── -->
     <section class="section" id="concierge">
       <h2 class="section-title"><span>02</span> The AI concierge</h2>
-      <p class="section-lede">Trained on my full career corpus. Ask it what a screening call would ask — scope, outcomes, how I build AI organisations. It cites the facts, refuses what's confidential, and will point you to <a href="#vault-section">the vault</a> or <a href="#contact">the real me</a> when it should.</p>
+      <p class="section-lede">Trained on my full career corpus. Ask it what a first conversation would cover — scope, outcomes, how I build AI organisations. It cites the facts, declines what's private, and points you to <a href="#vault-section">the Deeper Dive</a> or <a href="#contact">the real me</a> when it should.</p>
       <div class="chat-shell" id="chat-shell">
         <div class="chat-log" id="chat-log" aria-live="polite"></div>
         <div class="chat-chips" id="chat-chips"></div>
@@ -78,13 +85,13 @@
       </div>
     </section>
 
-    <!-- ── Career journey ───────────────────────── -->
+    <!-- ── Career journey ── -->
     <section class="section" id="journey">
       <h2 class="section-title"><span>03</span> The journey — 25 years, five transformations</h2>
       <div class="timeline" id="timeline"></div>
     </section>
 
-    <!-- ── Leadership / how I operate ───────────── -->
+    <!-- ── Leadership ── -->
     <section class="section" id="leadership">
       <h2 class="section-title"><span>04</span> How I operate</h2>
       <div class="philosophy-grid" id="philosophy-grid"></div>
@@ -94,38 +101,44 @@
       </div>
     </section>
 
-    <!-- ── LinkedIn pulse ───────────────────────── -->
+    <!-- ── LinkedIn pulse ── -->
     <section class="section" id="pulse">
       <h2 class="section-title"><span>05</span> LinkedIn pulse</h2>
-      <div class="pulse-grid" id="pulse-grid"></div>
+      <p class="section-lede" id="pulse-intro"></p>
+      <div class="pulse-top">
+        <div class="pulse-stat" id="pulse-stat"></div>
+        <div class="pulse-filters" id="pulse-filters"></div>
+      </div>
+      <div class="pulse-items" id="pulse-items"></div>
+      <p class="pulse-note" id="pulse-note"></p>
     </section>
 
-    <!-- ── Confidential vault ───────────────────── -->
+    <!-- ── Deeper Dive (key-gated, encrypted) ── -->
     <section class="section" id="vault-section">
-      <h2 class="section-title"><span>06</span> Confidential access</h2>
-      <p class="section-lede">Some of my current work at WSP — live programmes, commercial detail, current-engagement specifics — isn't public. If I've shared an access key with you, enter it here. Content is AES-256 encrypted; nothing confidential ships in plain text.</p>
+      <h2 class="section-title"><span>06</span> <span id="dd-title">Deeper Dive</span></h2>
+      <p class="section-lede" id="dd-intro"></p>
       <div class="vault" id="vault">
         <form class="vault-form" id="vault-form">
           <input id="vault-pass" type="password" placeholder="Access key" autocomplete="off" />
-          <button class="btn btn-primary" type="submit">Unlock</button>
+          <button class="btn btn-primary" type="submit">Open</button>
         </form>
         <p class="vault-msg" id="vault-msg"></p>
         <div class="vault-content" id="vault-content" hidden></div>
       </div>
     </section>
 
-    <!-- ── Education & interests ────────────────── -->
+    <!-- ── Education & interests ── -->
     <section class="section section-tight" id="education">
       <h2 class="section-title"><span>07</span> Education &amp; interests</h2>
       <div class="edu-grid" id="edu-grid"></div>
     </section>
 
-    <!-- ── Contact ──────────────────────────────── -->
+    <!-- ── Contact ── -->
     <section class="section contact" id="contact">
-      <h2 class="section-title"><span>08</span> Talk to the real me</h2>
-      <p class="section-lede">The concierge is good — but decisions this size deserve a conversation.</p>
+      <h2 class="section-title"><span>08</span> Let's talk</h2>
+      <p class="section-lede">The concierge is good — but the best conversations happen person to person.</p>
       <div class="contact-cards" id="contact-cards"></div>
-      <p class="contact-note">Interested in CTO, Chief AI Officer and Chief Digital Officer mandates — enterprise scale, region or global.</p>
+      <p class="contact-note">Always glad to connect with fellow technology and transformation leaders.</p>
     </section>
   </main>
 
@@ -133,10 +146,8 @@
     <p>© <span id="year"></span> Tarek Karaman · Designed &amp; built with AI — <button class="linklike" id="colophon-btn">how this site works</button> · <span class="mono">⌘K</span> for the command palette</p>
   </footer>
 
-  <!-- Floating chat launcher -->
   <button class="chat-fab" id="chat-fab" data-open-chat title="Ask my AI">✦</button>
 
-  <!-- Command palette -->
   <div class="palette-overlay" id="palette-overlay" hidden>
     <div class="palette" role="dialog" aria-label="Command palette">
       <input id="palette-input" type="text" placeholder="Type a command or search…" autocomplete="off" />
@@ -144,7 +155,6 @@
     </div>
   </div>
 
-  <!-- Colophon modal -->
   <div class="palette-overlay" id="colophon-overlay" hidden>
     <div class="palette colophon" role="dialog" aria-label="About this site">
       <h3>How this site works</h3>
@@ -153,7 +163,6 @@
     </div>
   </div>
 
-  <!-- Terminal easter egg -->
   <div class="terminal-overlay" id="terminal-overlay" hidden>
     <div class="terminal" role="dialog" aria-label="Terminal">
       <div class="terminal-bar"><span></span><span></span><span></span> tk@career — zsh <button id="terminal-close">✕</button></div>
@@ -164,6 +173,8 @@
       </div>
     </div>
   </div>
+
+  <audio id="voice-audio" preload="none"></audio>
 
   <script type="module" src="/src/main.js"></script>
 </body>

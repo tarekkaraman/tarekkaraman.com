@@ -1,19 +1,19 @@
-// Hidden terminal — the easter egg for the engineers on the hiring panel.
-// Reachable via ⌘K → "terminal", or typing "tk!" anywhere on the page.
+// Hidden terminal — the easter egg for the engineers on the panel.
+// Reachable via ⌘K → "terminal", or typing "tk!" anywhere.
 
-import { profile } from './data/profile.js';
+import { DEFAULT_CONTENT } from './data/content.js';
 
 const $ = (s) => document.querySelector(s);
+let profile = DEFAULT_CONTENT;
+export function setTerminalData(c) { profile = c; }
 
-const FILES = {
+const files = () => ({
   'about.txt': profile.about,
-  'experience.log': profile.experience
-    .map((x) => `[${x.period}] ${x.company} — ${x.role}\n  ${x.bullets.join('\n  ')}`)
-    .join('\n\n'),
+  'experience.log': profile.experience.map((x) => `[${x.period}] ${x.company} — ${x.role}\n  ${x.bullets.join('\n  ')}`).join('\n\n'),
   'skills.yaml': profile.skills.map((s) => `- ${s}`).join('\n'),
   'contact.vcf': `EMAIL: ${profile.email}\nLINKEDIN: ${profile.linkedin}\nPHONE: ${profile.phone}\nLOCATION: ${profile.location}`,
-  'vault.enc': '�AES-256-GCM�… nice try. Access keys are issued by Tarek in person.'
-};
+  'deeper-dive.enc': '�AES-256-GCM�… nice try. Keys are shared by Tarek in person.'
+});
 
 const HELP = `Available commands:
   help          this menu
@@ -22,21 +22,21 @@ const HELP = `Available commands:
   whoami        who is tarek?
   stats         the numbers
   sudo hire     escalate privileges
+  clear         clear screen
   exit          close terminal`;
 
 function run(cmd) {
   const [c, ...args] = cmd.trim().split(/\s+/);
   const arg = args.join(' ');
+  const F = files();
   switch (c) {
     case '': return '';
     case 'help': return HELP;
-    case 'ls': return Object.keys(FILES).join('\n');
-    case 'cat': return FILES[arg] || `cat: ${arg || '<file>'}: No such file`;
-    case 'whoami': return `${profile.name} — ${profile.headline}\n${profile.role}\nTarget: ${profile.targetRoles}`;
+    case 'ls': return Object.keys(F).join('\n');
+    case 'cat': return F[arg] || `cat: ${arg || '<file>'}: No such file`;
+    case 'whoami': return `${profile.name} — ${profile.headline}\n${profile.role}`;
     case 'stats': return profile.stats.map((s) => `${(s.prefix || '') + s.value.toLocaleString('en-US') + (s.suffix || '')}  ${s.label}`).join('\n');
-    case 'sudo': return arg === 'hire'
-      ? `[sudo] password for recruiter: ********\nPrivileges granted. Next step: ${profile.email}`
-      : `sudo: ${arg}: command not found`;
+    case 'sudo': return arg === 'hire' ? `[sudo] password for recruiter: ********\nPrivileges granted. Next step: ${profile.email}` : `sudo: ${arg}: command not found`;
     case 'clear': $('#terminal-body').textContent = ''; return null;
     case 'exit': closeTerminal(); return null;
     default: return `zsh: command not found: ${c} — type 'help'`;
@@ -48,8 +48,7 @@ function print(text, isCmd = false) {
   const line = document.createElement('div');
   if (isCmd) line.innerHTML = `<span class="cmd">tk ❯ ${text.replace(/&/g, '&amp;').replace(/</g, '&lt;')}</span>`;
   else line.textContent = text;
-  body.append(line);
-  body.scrollTop = body.scrollHeight;
+  body.append(line); body.scrollTop = body.scrollHeight;
 }
 
 export function openTerminal() {
@@ -63,7 +62,6 @@ export function openTerminal() {
   }
   $('#terminal-input').focus();
 }
-
 export function closeTerminal() { $('#terminal-overlay').hidden = true; }
 
 export function initTerminal() {
@@ -72,8 +70,7 @@ export function initTerminal() {
   $('#terminal-input').addEventListener('keydown', (e) => {
     if (e.key === 'Escape') closeTerminal();
     if (e.key !== 'Enter') return;
-    const cmd = e.target.value;
-    e.target.value = '';
+    const cmd = e.target.value; e.target.value = '';
     print(cmd, true);
     const out = run(cmd);
     if (out) print(out);

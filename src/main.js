@@ -1,7 +1,7 @@
-import { profile } from './data/profile.js';
-import { initChat, openChat, askChat } from './chat.js';
-import { initVault } from './vault.js';
-import { initTerminal, openTerminal } from './terminal.js';
+import { loadContent } from './data/content.js';
+import { initChat, openChat, setCorpus } from './chat.js';
+import { initVault, setVaultFraming } from './vault.js';
+import { initTerminal, openTerminal, setTerminalData } from './terminal.js';
 
 const $ = (s) => document.querySelector(s);
 const el = (tag, cls, html) => {
@@ -20,175 +20,203 @@ themeBtn.addEventListener('click', () => {
   const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
   document.documentElement.dataset.theme = next;
   localStorage.setItem('tk-theme', next);
+  $('meta[name="theme-color"]').setAttribute('content', next === 'dark' ? '#070b17' : '#ffffff');
 });
 
-/* ── Recruiter mode ── */
+/* ── Recruiter / quick view ── */
 const recruiterBtn = $('#recruiter-toggle');
 function setRecruiter(on) {
   document.body.classList.toggle('recruiter', on);
   recruiterBtn.classList.toggle('on', on);
-  recruiterBtn.textContent = on ? '✓ Recruiter mode' : 'Recruiter mode';
+  recruiterBtn.textContent = on ? '✓ Quick view' : 'Quick view';
 }
 recruiterBtn.addEventListener('click', () => setRecruiter(!document.body.classList.contains('recruiter')));
 
-/* ── Scorecard ── */
-const statsGrid = $('#stats-grid');
-profile.stats.forEach((s) => {
-  const card = el('div', 'stat');
-  card.append(el('b', null, `${s.prefix || ''}0${s.suffix || ''}`), el('span', null, esc(s.label)));
-  card.dataset.value = s.value;
-  card.dataset.prefix = s.prefix || '';
-  card.dataset.suffix = s.suffix || '';
-  statsGrid.append(card);
-});
+/* ── Boot: load content, then render ── */
+const previewMode = new URLSearchParams(location.search).has('preview');
+loadContent({ preferDraft: previewMode }).then((profile) => render(profile));
+
+function render(profile) {
+  setCorpus(profile);
+  setTerminalData(profile);
+  setVaultFraming(profile.deeperDive);
+
+  /* Voice intro */
+  if (profile.voiceIntro) {
+    const btn = $('#voice-btn');
+    const audio = $('#voice-audio');
+    audio.src = profile.voiceIntro;
+    btn.hidden = false;
+    btn.addEventListener('click', () => {
+      if (audio.paused) { audio.play(); btn.classList.add('playing'); $('#voice-ico').textContent = '❚❚'; $('#voice-label').textContent = 'Playing intro…'; }
+      else { audio.pause(); btn.classList.remove('playing'); $('#voice-ico').textContent = '▶'; $('#voice-label').textContent = 'Hear a 60-second intro'; }
+    });
+    audio.addEventListener('ended', () => { btn.classList.remove('playing'); $('#voice-ico').textContent = '▶'; $('#voice-label').textContent = 'Hear a 60-second intro'; });
+  }
+
+  /* Scorecard */
+  const statsGrid = $('#stats-grid');
+  profile.stats.forEach((s) => {
+    const card = el('div', 'stat');
+    card.append(el('b', null, `<span class="g">${s.prefix || ''}0${s.suffix || ''}</span>`), el('span', null, esc(s.label)));
+    card.dataset.value = s.value; card.dataset.prefix = s.prefix || ''; card.dataset.suffix = s.suffix || '';
+    statsGrid.append(card);
+  });
+  const partnersStrip = $('#partners-strip');
+  partnersStrip.append(el('h4', null, 'Key partnerships'),
+    el('ul', null, profile.partnerships.map((p) => `<li><b>${esc(p.name)}</b> — ${esc(p.area)}</li>`).join('')));
+  const awardsStrip = $('#awards-strip');
+  awardsStrip.append(el('h4', null, 'Awards & recognition'),
+    el('ul', null, profile.awards.map((a) => `<li>${esc(a)}</li>`).join('')));
+
+  /* Timeline */
+  const timeline = $('#timeline');
+  profile.experience.forEach((x) => {
+    const item = el('div', 'tl-item reveal');
+    item.append(el('span', 'tl-period', esc(x.period)));
+    const head = el('div', 'tl-head');
+    head.append(el('h3', null, esc(x.company)), el('span', 'tl-role', esc(x.role)));
+    item.append(head, el('div', 'tl-loc', esc(x.location)), el('p', 'tl-summary', esc(x.summary)),
+      el('ul', 'tl-bullets', x.bullets.map((b) => `<li>${esc(b)}</li>`).join('')));
+    if (x.more) {
+      const lock = el('button', 'tl-lock', '🔑 More detail in the Deeper Dive — with a key');
+      lock.addEventListener('click', () => $('#vault-section').scrollIntoView({ behavior: 'smooth' }));
+      item.append(lock);
+    }
+    timeline.append(item);
+  });
+
+  /* Philosophy */
+  const philGrid = $('#philosophy-grid');
+  profile.philosophy.forEach((p) => {
+    const card = el('div', 'phil reveal');
+    card.append(el('h3', null, `<span>${esc(p.title)}</span>`), el('p', null, esc(p.body)));
+    philGrid.append(card);
+  });
+  const skills = $('#skills');
+  profile.skills.forEach((s) => skills.append(el('span', null, esc(s))));
+
+  /* LinkedIn pulse */
+  const lp = profile.linkedinPulse;
+  $('#pulse-intro').textContent = lp.intro || '';
+  const pstat = $('#pulse-stat');
+  pstat.append(el('b', null, lp.followers.toLocaleString('en-US')),
+    el('span', null, `followers · ${esc(lp.connections)} connections`),
+    Object.assign(el('a', null, 'View LinkedIn →'), { href: profile.linkedin, target: '_blank', rel: 'noopener' }));
+
+  const verbs = { liked: 'Liked', commented: 'Commented', reshared: 'Reshared', posted: 'Posted' };
+  const themesSet = ['All', ...new Set(lp.engagement.map((e) => e.theme))];
+  const filters = $('#pulse-filters');
+  const itemsWrap = $('#pulse-items');
+  let activeFilter = 'All';
+  function renderPulse() {
+    itemsWrap.innerHTML = '';
+    lp.engagement.filter((e) => activeFilter === 'All' || e.theme === activeFilter).forEach((e) => {
+      const card = el('div', 'pulse-item');
+      card.innerHTML =
+        `<div class="row1"><span class="pulse-verb pv-${e.type}">${verbs[e.type] || e.type}</span><span class="when">${esc(e.when)}</span></div>` +
+        `<div class="actor">${esc(e.actor)}</div><div class="snip">${esc(e.text)}${e.impressions ? ` · ${e.impressions.toLocaleString('en-US')} impressions` : ''}</div>` +
+        `<span class="theme">#${esc(e.theme.replace(/\s+/g, ''))}</span>`;
+      card.addEventListener('click', () => card.classList.toggle('open'));
+      itemsWrap.append(card);
+    });
+  }
+  themesSet.forEach((t) => {
+    const b = el('button', t === 'All' ? 'on' : '', esc(t));
+    b.addEventListener('click', () => { activeFilter = t; [...filters.children].forEach((c) => c.classList.remove('on')); b.classList.add('on'); renderPulse(); });
+    filters.append(b);
+  });
+  renderPulse();
+  $('#pulse-note').textContent = lp.note || '';
+
+  /* Deeper Dive framing */
+  $('#dd-title').textContent = profile.deeperDive?.title || 'Deeper Dive';
+  $('#dd-intro').textContent = profile.deeperDive?.intro || '';
+
+  /* Education & interests */
+  const eduGrid = $('#edu-grid');
+  profile.education.forEach((e) => eduGrid.append(el('div', 'edu', `<b>${esc(e.title)}</b><span>${esc(e.place)}</span>`)));
+  eduGrid.append(el('div', 'edu', `<b>Interests</b><span>${esc(profile.interests.join(' · '))}</span>`));
+
+  /* Contact */
+  const contactCards = $('#contact-cards');
+  [
+    { label: 'Email', value: profile.email, href: `mailto:${profile.email}` },
+    { label: 'LinkedIn', value: 'linkedin.com/in/tarekkaraman', href: profile.linkedin },
+    { label: 'Phone', value: profile.phone, href: `tel:${profile.phone.replace(/\s/g, '')}` }
+  ].forEach((c) => {
+    const a = el('a', 'contact-card');
+    a.href = c.href;
+    if (c.href.startsWith('http')) { a.target = '_blank'; a.rel = 'noopener'; }
+    a.append(el('b', null, esc(c.label)), el('span', null, esc(c.value)));
+    contactCards.append(a);
+  });
+
+  /* Reveal + stat count-up */
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach((e) => {
+      if (e.isIntersecting) {
+        e.target.classList.add('in');
+        if (e.target.classList.contains('stat')) animateStat(e.target);
+        io.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.25 });
+  document.querySelectorAll('.reveal, .stat').forEach((n) => io.observe(n));
+  document.querySelectorAll('.hero .reveal').forEach((n, i) => setTimeout(() => n.classList.add('in'), 80 * i));
+
+  initChat();
+
+  /* Palette commands that depend on content */
+  buildPalette(profile);
+}
 
 function animateStat(card) {
   const target = Number(card.dataset.value);
-  const b = card.querySelector('b');
-  const dur = 1400;
-  const t0 = performance.now();
+  const g = card.querySelector('.g');
+  const dur = 1400, t0 = performance.now();
   const fmt = (v) => `${card.dataset.prefix}${v.toLocaleString('en-US')}${card.dataset.suffix}`;
-  if (matchMedia('(prefers-reduced-motion: reduce)').matches) { b.textContent = fmt(target); return; }
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) { g.textContent = fmt(target); return; }
   const tick = (t) => {
     const p = Math.min(1, (t - t0) / dur);
-    const eased = 1 - Math.pow(1 - p, 3);
-    b.textContent = fmt(Math.round(target * eased));
+    g.textContent = fmt(Math.round(target * (1 - Math.pow(1 - p, 3))));
     if (p < 1) requestAnimationFrame(tick);
   };
   requestAnimationFrame(tick);
 }
 
-const partnersStrip = $('#partners-strip');
-partnersStrip.append(el('h4', null, 'Key partnerships'));
-partnersStrip.append(el('ul', null, profile.partnerships.map((p) => `<li><b>${esc(p.name)}</b> — ${esc(p.area)}</li>`).join('')));
-
-const awardsStrip = $('#awards-strip');
-awardsStrip.append(el('h4', null, 'Awards & recognition'));
-awardsStrip.append(el('ul', null, profile.awards.map((a) => `<li>${esc(a)}</li>`).join('')));
-
-/* ── Timeline ── */
-const timeline = $('#timeline');
-profile.experience.forEach((x) => {
-  const item = el('div', 'tl-item reveal');
-  item.append(el('span', 'tl-period', esc(x.period)));
-  const head = el('div', 'tl-head');
-  head.append(el('h3', null, esc(x.company)), el('span', 'tl-role', esc(x.role)));
-  item.append(head);
-  item.append(el('div', 'tl-loc', esc(x.location)));
-  item.append(el('p', 'tl-summary', esc(x.summary)));
-  item.append(el('ul', 'tl-bullets', x.bullets.map((b) => `<li>${esc(b)}</li>`).join('')));
-  if (x.locked) {
-    const lock = el('button', 'tl-lock', '🔒 Current-engagement detail is confidential — unlock with an access key');
-    lock.addEventListener('click', () => $('#vault-section').scrollIntoView({ behavior: 'smooth' }));
-    item.append(lock);
-  }
-  timeline.append(item);
-});
-
-/* ── Philosophy ── */
-const philosophy = [
-  { title: 'Capability, not projects', body: 'AI initiatives fail as one-off pilots. I build accelerators, delivery centres and academies — the organisational muscle that keeps shipping after the headline project ends.' },
-  { title: 'Governance is an enabler', body: 'Ethical and legal guardrails embedded from day one are what let 60,000 people use AI daily without incident. Compliance done right speeds adoption; it doesn’t slow it.' },
-  { title: 'Adoption is the product', body: 'A deployed tool nobody uses is a cost. I measure success in changed ways of working — enablement, training, and executive sponsorship are engineered, not hoped for.' },
-  { title: 'Partner at the top', body: 'Microsoft, IBM, Google, PwC — the fastest route to enterprise-grade AI is pairing internal capability with the ecosystem’s best, on commercial terms that work.' },
-  { title: 'Commercial outcomes', body: 'Bid-win rates, delivery effort, revenue growth, $20M+ programs. Technology strategy only matters when it lands on the P&L.' },
-  { title: 'Build teams that outlast you', body: 'From 100+ technical staff at my own venture to WSP’s AI delivery hub — hiring, mentoring and operating models are the real legacy of any leadership role.' }
-];
-const philGrid = $('#philosophy-grid');
-philosophy.forEach((p) => {
-  const card = el('div', 'phil reveal');
-  card.append(el('h3', null, esc(p.title)), el('p', null, esc(p.body)));
-  philGrid.append(card);
-});
-
-const skills = $('#skills');
-profile.skills.forEach((s) => skills.append(el('span', null, esc(s))));
-
-/* ── LinkedIn pulse ── */
-const pulse = $('#pulse-grid');
-const pstat = el('div', 'pulse-stat');
-pstat.append(
-  el('b', null, profile.linkedinPulse.followers.toLocaleString('en-US')),
-  el('span', null, `followers · ${esc(profile.linkedinPulse.connections)} connections`),
-  Object.assign(el('a', null, 'View LinkedIn profile →'), { href: profile.linkedin, target: '_blank', rel: 'noopener' })
-);
-pulse.append(pstat);
-const pitems = el('div', 'pulse-items');
-profile.linkedinPulse.highlights.forEach((h) => {
-  const row = el('div', 'pulse-item');
-  row.append(
-    el('span', 'when', esc(h.when)),
-    el('span', null, esc(h.text)),
-    el('span', 'imp', `${h.impressions.toLocaleString('en-US')} impressions`)
-  );
-  pitems.append(row);
-});
-pitems.append(el('p', 'pulse-note', esc(profile.linkedinPulse.note)));
-pulse.append(pitems);
-
-/* ── Education & interests ── */
-const eduGrid = $('#edu-grid');
-profile.education.forEach((e) => {
-  const card = el('div', 'edu');
-  card.append(el('b', null, esc(e.title)), el('span', null, esc(e.place)));
-  eduGrid.append(card);
-});
-const intCard = el('div', 'edu');
-intCard.append(el('b', null, 'Interests'), el('span', null, esc(profile.interests.join(' · '))));
-eduGrid.append(intCard);
-
-/* ── Contact ── */
-const contactCards = $('#contact-cards');
-[
-  { label: 'Email', value: profile.email, href: `mailto:${profile.email}` },
-  { label: 'LinkedIn', value: 'linkedin.com/in/tarekkaraman', href: profile.linkedin },
-  { label: 'Phone', value: profile.phone, href: `tel:${profile.phone.replace(/\s/g, '')}` }
-].forEach((c) => {
-  const a = el('a', 'contact-card');
-  a.href = c.href;
-  if (c.href.startsWith('http')) { a.target = '_blank'; a.rel = 'noopener'; }
-  a.append(el('b', null, esc(c.label)), el('span', null, esc(c.value)));
-  contactCards.append(a);
-});
-
 $('#year').textContent = new Date().getFullYear();
-
-/* ── Reveal on scroll ── */
-const io = new IntersectionObserver((entries) => {
-  entries.forEach((e) => {
-    if (e.isIntersecting) {
-      e.target.classList.add('in');
-      if (e.target.classList.contains('stat')) animateStat(e.target);
-      io.unobserve(e.target);
-    }
-  });
-}, { threshold: 0.25 });
-document.querySelectorAll('.reveal, .stat').forEach((n) => io.observe(n));
-// Hero reveals immediately
-document.querySelectorAll('.hero .reveal').forEach((n, i) => setTimeout(() => n.classList.add('in'), 80 * i));
 
 /* ── Command palette ── */
 const overlay = $('#palette-overlay');
 const pInput = $('#palette-input');
 const pList = $('#palette-list');
-const commands = [
-  { name: 'Ask my AI', k: 'chat', run: () => openChat() },
-  { name: 'Download CV (PDF)', k: 'pdf', run: () => { location.href = './Tarek_Karaman_CV.pdf'; } },
-  { name: 'Recruiter mode — 90-second view', k: 'toggle', run: () => setRecruiter(!document.body.classList.contains('recruiter')) },
-  { name: 'Confidential access (vault)', k: 'go', run: () => $('#vault-section').scrollIntoView({ behavior: 'smooth' }) },
-  { name: 'Copy email address', k: 'copy', run: () => navigator.clipboard?.writeText(profile.email) },
-  { name: 'Open LinkedIn', k: 'link', run: () => window.open(profile.linkedin, '_blank') },
-  { name: 'Jump: Executive scorecard', k: 'go', run: () => $('#scorecard').scrollIntoView({ behavior: 'smooth' }) },
-  { name: 'Jump: Career journey', k: 'go', run: () => $('#journey').scrollIntoView({ behavior: 'smooth' }) },
-  { name: 'Jump: How I operate', k: 'go', run: () => $('#leadership').scrollIntoView({ behavior: 'smooth' }) },
-  { name: 'Jump: Contact', k: 'go', run: () => $('#contact').scrollIntoView({ behavior: 'smooth' }) },
-  { name: 'Toggle dark / light theme', k: 'theme', run: () => themeBtn.click() },
-  { name: 'terminal', k: 'ssh tk@career', run: () => openTerminal(), hidden: true }
-];
+let commands = [];
 let sel = 0;
+
+function buildPalette(profile) {
+  commands = [
+    { name: 'Ask my AI', k: 'chat', run: () => openChat() },
+    { name: 'Download CV (PDF)', k: 'pdf', run: () => { location.href = './Tarek_Karaman_CV.pdf'; } },
+    { name: 'Quick view — 90-second version', k: 'toggle', run: () => setRecruiter(!document.body.classList.contains('recruiter')) },
+    { name: 'Deeper Dive (key required)', k: 'go', run: () => $('#vault-section').scrollIntoView({ behavior: 'smooth' }) },
+    { name: 'Copy email address', k: 'copy', run: () => navigator.clipboard?.writeText(profile.email) },
+    { name: 'Open LinkedIn', k: 'link', run: () => window.open(profile.linkedin, '_blank') },
+    { name: 'Jump: Executive scorecard', k: 'go', run: () => $('#scorecard').scrollIntoView({ behavior: 'smooth' }) },
+    { name: 'Jump: Career journey', k: 'go', run: () => $('#journey').scrollIntoView({ behavior: 'smooth' }) },
+    { name: 'Jump: How I operate', k: 'go', run: () => $('#leadership').scrollIntoView({ behavior: 'smooth' }) },
+    { name: 'Jump: LinkedIn pulse', k: 'go', run: () => $('#pulse').scrollIntoView({ behavior: 'smooth' }) },
+    { name: 'Jump: Contact', k: 'go', run: () => $('#contact').scrollIntoView({ behavior: 'smooth' }) },
+    { name: 'Toggle dark / light theme', k: 'theme', run: () => themeBtn.click() },
+    { name: 'Open the CMS / editor', k: 'admin', run: () => window.open('./admin.html', '_blank') },
+    { name: 'terminal', k: 'ssh tk@career', run: () => openTerminal(), hidden: true }
+  ];
+}
+buildPalette({ email: 'tarekkaraman@me.com', linkedin: 'https://www.linkedin.com/in/tarekkaraman' });
+
 function renderPalette(q = '') {
   const items = commands.filter((c) => {
-    if (c.hidden && q.toLowerCase() !== 'terminal' && !'terminal'.startsWith(q.toLowerCase() || '∅')) return false;
+    if (c.hidden && !'terminal'.startsWith((q || '∅').toLowerCase())) return false;
     return c.name.toLowerCase().includes(q.toLowerCase());
   });
   pList.innerHTML = '';
@@ -220,26 +248,24 @@ document.addEventListener('keydown', (e) => {
 const colOverlay = $('#colophon-overlay');
 $('#colophon-btn').addEventListener('click', () => {
   $('#colophon-body').innerHTML = `
-    <p>This site is a working demonstration of how I ship AI products — designed, written and engineered end-to-end with AI (Claude), directed by me.</p>
-    <p><b>The concierge</b> answers from a structured corpus of my career — grounded, guardrailed, and honest about what it can't discuss. When hosted with an API backend it runs on Claude; on static hosting it falls back to an on-device retrieval engine. No third-party chat widget, no vendor branding.</p>
-    <p><b>The vault</b> uses real cryptography: confidential content is AES-256-GCM encrypted at build time (PBKDF2, 310k iterations). The plain text never ships — not even in the public repository.</p>
-    <p><b>The stack</b> is deliberately lean: no framework, sub-second first paint, full keyboard navigation (⌘K), dark/light, print-perfect, mobile-first. Judgment about when <i>not</i> to add technology is the point.</p>`;
+    <p>This site was designed, written and engineered end-to-end with AI (Claude), directed by Tarek — which is the demonstration itself.</p>
+    <p><b>The concierge</b> answers from a structured corpus of his career — grounded, guardrailed, and honest about what it can't discuss. Hosted with a backend it runs on Claude; on static hosting it falls back to an on-device retrieval engine.</p>
+    <p><b>The Deeper Dive</b> uses real cryptography: private content is AES-256-GCM encrypted (PBKDF2, 310k iterations). The plain text never ships — not even in the public repository.</p>
+    <p><b>The stack</b> is deliberately lean: no framework, sub-second first paint, ⌘K navigation, dark/light, print-perfect, mobile-first — plus a lightweight CMS so the whole thing stays editable. Knowing when <i>not</i> to add technology is the point.</p>`;
   colOverlay.hidden = false;
 });
 $('#colophon-close').addEventListener('click', () => { colOverlay.hidden = true; });
 colOverlay.addEventListener('click', (e) => { if (e.target === colOverlay) colOverlay.hidden = true; });
 
-/* ── Chat open buttons ── */
 document.querySelectorAll('[data-open-chat]').forEach((b) => b.addEventListener('click', () => openChat()));
 
-/* ── Konami-lite easter egg: type "tk" anywhere ── */
+/* Easter egg: type "tk!" */
 let buffer = '';
 document.addEventListener('keydown', (e) => {
   if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
   buffer = (buffer + e.key).slice(-4);
-  if (buffer.endsWith('>tk') || buffer.endsWith('tk!')) openTerminal();
+  if (buffer.endsWith('tk!') || buffer.endsWith('>tk')) openTerminal();
 });
 
-initChat();
 initVault();
 initTerminal();
