@@ -18,7 +18,7 @@
 .mode-pill.live { color: var(--good); border-color: color-mix(in srgb, var(--good) 40%, transparent); }
 .admin-tabs { display: flex; gap: 6px; margin-left: 8px; }
 .tab { border: 1px solid var(--line-soft); background: transparent; color: var(--text-dim); border-radius: 9px; padding: 7px 14px; cursor: pointer; font: inherit; font-size: .86rem; font-weight: 600; }
-.tab.on { background: var(--grad); color: #fff; border-color: transparent; }
+.tab.on { background: var(--grad); color: var(--on-accent); border-color: transparent; }
 .admin-actions { margin-left: auto; display: flex; gap: 8px; }
 
 .admin-main { max-width: 900px; margin: 0 auto; padding: 24px 20px 80px; }
