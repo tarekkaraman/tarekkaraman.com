@@ -14,6 +14,8 @@ let mode = { kv: false, hasKey: false, live: false };
 let state = clone(DEFAULT_CONTENT);
 let vaultState = { sections: [{ title: '', body: '', bullets: [] }], portfolio: [] };
 let vaultKey = '';
+let refsState = { intro: '', references: [{ name: '', role: '', relationship: '', contact: 'Available on request' }] };
+let refsKey = '';
 
 /* ── Persistence-mode detection ── */
 async function detectMode() {
@@ -58,6 +60,8 @@ async function boot() {
   state = { ...clone(DEFAULT_CONTENT), ...clone(current) };
   const vd = JSON.parse(localStorage.getItem('tk-vault-draft') || 'null');
   if (vd) vaultState = vd;
+  const rd = JSON.parse(localStorage.getItem('tk-refs-draft') || 'null');
+  if (rd) refsState = rd;
   renderContent();
   renderPrivate();
   renderPublish();
@@ -136,13 +140,13 @@ function renderContent() {
   p.append(el('h2', null, 'Public content'), el('p', 'hint', 'Everything on the main site. Edits are live-bound; use Save draft to preview, then Publish.'));
 
   // raw JSON toggle
-  const rawBtn = el('button', 'raw-toggle', 'Show raw JSON editor (advanced — full control)');
+  const rawBtn = el('button', 'raw-toggle', 'Show raw JSON editor (advanced, full control)');
   const rawWrap = el('div', 'raw-editor grp'); rawWrap.hidden = true;
   const rawTa = el('textarea');
   const syncRaw = () => { rawTa.value = JSON.stringify(state, null, 2); };
   rawBtn.addEventListener('click', () => {
     rawWrap.hidden = !rawWrap.hidden;
-    rawBtn.textContent = rawWrap.hidden ? 'Show raw JSON editor (advanced — full control)' : 'Hide raw JSON editor';
+    rawBtn.textContent = rawWrap.hidden ? 'Show raw JSON editor (advanced, full control)' : 'Hide raw JSON editor';
     if (!rawWrap.hidden) syncRaw();
   });
   rawTa.addEventListener('input', () => { try { const o = JSON.parse(rawTa.value); state = o; rawTa.style.borderColor = ''; } catch { rawTa.style.borderColor = '#e0245e'; } });
@@ -208,7 +212,10 @@ function renderContent() {
 
   // Deeper Dive framing
   const dd = state.deeperDive || (state.deeperDive = { title: 'Deeper Dive', intro: '', cta: '' });
-  p.append(group('Deeper Dive framing', textField(dd, 'title', 'Section title'), textField(dd, 'intro', 'Intro', { textarea: true })));
+  p.append(group('Deeper Dive framing',
+    textField(dd, 'title', 'Section title'), textField(dd, 'intro', 'Intro', { textarea: true }),
+    textField(dd, 'referencesTitle', 'References sub-section title'),
+    textField(dd, 'referencesIntro', 'References intro (shown above the 2nd password)', { textarea: true })));
 
   // Education + interests
   p.append(group('Education', cardList(state.education, (card, x) => {
@@ -243,6 +250,27 @@ function renderPrivate() {
   p.append(group('Portfolio', cardList(vaultState.portfolio, (card, x) => {
     card.append(textField(x, 'title', 'Title'), textField(x, 'body', 'Description', { textarea: true }));
   }, { title: '', body: '' }, 'Add portfolio item')));
+
+  // ── References: behind a SECOND, separate password ──
+  p.append(el('h2', null, 'References (second password)'), el('p', 'hint', 'A separate encrypted file with its own password, shown inside the Deeper Dive. Give this second key only to people you want to reach your referees.'));
+
+  const rkGrp = el('div', 'grp');
+  rkGrp.append(el('h3', null, 'References password (second key)'));
+  const rkf = el('div', 'field');
+  rkf.append(el('label', null, 'References password'));
+  const rki = el('input'); rki.type = 'text'; rki.value = refsKey; rki.placeholder = 'a different phrase to the Deeper Dive key';
+  rki.addEventListener('input', () => { refsKey = rki.value; });
+  rkf.append(rki, el('div', 'sub', 'Keep this different from the Deeper Dive key so references stay separately gated.'));
+  const rLoad = el('button', 'add-btn', '↓ Load current references (needs the existing references password)');
+  rLoad.addEventListener('click', loadExistingRefs);
+  rkGrp.append(rkf, rLoad);
+  p.append(rkGrp);
+
+  p.append(group('References intro', textField(refsState, 'intro', 'Intro text', { textarea: true })));
+  if (!refsState.references) refsState.references = [];
+  p.append(group('Referees', cardList(refsState.references, (card, r) => {
+    card.append(textField(r, 'name', 'Name'), textField(r, 'role', 'Title, Company'), textField(r, 'relationship', 'Relationship to you'), textField(r, 'contact', 'Contact (or "Available on request")'));
+  }, { name: '', role: '', relationship: '', contact: 'Available on request' }, 'Add referee')));
 }
 
 async function loadExistingVault() {
@@ -256,19 +284,33 @@ async function loadExistingVault() {
     vaultKey = key;
     renderPrivate();
     alert('Loaded. You can now edit and re-publish.');
-  } catch { alert('Could not decrypt — wrong key or nothing published yet.'); }
+  } catch { alert('Could not decrypt, wrong key or nothing published yet.'); }
+}
+
+async function loadExistingRefs() {
+  const key = prompt('Enter the CURRENT references password to load & decrypt them:');
+  if (!key) return;
+  try {
+    const r = await fetch('./references.enc.json'); if (!r.ok) throw 0;
+    const data = await decrypt(await r.json(), key);
+    refsState = { intro: data.intro || '', references: data.references || [] };
+    refsKey = key;
+    renderPrivate();
+    alert('References loaded. You can now edit and re-publish.');
+  } catch { alert('Could not decrypt, wrong references password or nothing published yet.'); }
 }
 
 /* ── Publish tab ── */
 function renderPublish() {
   $('#publish-status').textContent = mode.live
-    ? 'Live mode: “Publish live” writes content to Cloudflare KV — visible to everyone immediately. The Deeper Dive is published as a file you commit.'
+    ? 'Live mode: “Publish live” writes content to Cloudflare KV, visible to everyone immediately. The Deeper Dive is published as a file you commit.'
     : 'File mode: download content.json and vault.enc.json, commit them to the repo, and push. GitHub Pages redeploys automatically.';
   $('#pub-help').innerHTML = mode.live
     ? `<b>Deeper Dive on Cloudflare:</b> download <code>vault.enc.json</code> and commit it (the encrypted file is served statically). Content itself persists live in KV.`
     : `<b>To publish on GitHub Pages:</b><ol>
         <li>Click <b>Download content.json</b> → save into the repo's <code>public/</code> folder.</li>
         <li>If you edited the Deeper Dive, click <b>Download vault.enc.json</b> → also into <code>public/</code>.</li>
+        <li>If you edited references, click <b>Download references.enc.json</b> → also into <code>public/</code>.</li>
         <li>Commit &amp; push (or drag into GitHub's web uploader). The site redeploys in ~1 min.</li></ol>`;
 }
 
@@ -276,6 +318,7 @@ function renderPublish() {
 $('#savedraft-btn').addEventListener('click', () => {
   localStorage.setItem('tk-content-draft', JSON.stringify(state));
   localStorage.setItem('tk-vault-draft', JSON.stringify(vaultState));
+  localStorage.setItem('tk-refs-draft', JSON.stringify(refsState));
   flash($('#savedraft-btn'), 'Saved ✓');
 });
 $('#preview-btn').addEventListener('click', () => {
@@ -286,7 +329,7 @@ $('#preview-btn').addEventListener('click', () => {
 /* ── Publish live / downloads ── */
 $('#publish-live').addEventListener('click', async () => {
   const msg = $('#publish-msg');
-  if (!mode.live) { msg.className = 'pub-msg err'; msg.textContent = 'Live persistence not configured — use the download buttons instead.'; return; }
+  if (!mode.live) { msg.className = 'pub-msg err'; msg.textContent = 'Live persistence not configured, use the download buttons instead.'; return; }
   msg.className = 'pub-msg'; msg.textContent = 'publishing…';
   try {
     const r = await fetch('./api/content', { method: 'PUT', headers: { 'content-type': 'application/json', 'x-admin-key': adminKey }, body: JSON.stringify(state) });
@@ -304,6 +347,16 @@ $('#download-vault').addEventListener('click', async () => {
     const blob = await encrypt(vaultState, vaultKey);
     download('vault.enc.json', JSON.stringify(blob, null, 2));
     msg.className = 'pub-msg ok'; msg.textContent = '✓ vault.enc.json encrypted & downloaded';
+  } catch (e) { msg.className = 'pub-msg err'; msg.textContent = `✕ ${e.message}`; }
+});
+$('#download-refs').addEventListener('click', async () => {
+  const msg = $('#publish-msg');
+  if (!refsKey) { msg.className = 'pub-msg err'; msg.textContent = 'Set a references password in the Deeper Dive tab first.'; return; }
+  msg.className = 'pub-msg'; msg.textContent = 'encrypting references…';
+  try {
+    const blob = await encrypt(refsState, refsKey);
+    download('references.enc.json', JSON.stringify(blob, null, 2));
+    msg.className = 'pub-msg ok'; msg.textContent = '✓ references.enc.json encrypted & downloaded';
   } catch (e) { msg.className = 'pub-msg err'; msg.textContent = `✕ ${e.message}`; }
 });
 

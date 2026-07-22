@@ -64,7 +64,7 @@ function render(profile) {
   });
   const partnersStrip = $('#partners-strip');
   partnersStrip.append(el('h4', null, 'Key partnerships'),
-    el('ul', null, profile.partnerships.map((p) => `<li><b>${esc(p.name)}</b> — ${esc(p.area)}</li>`).join('')));
+    el('ul', null, profile.partnerships.map((p) => `<li><b>${esc(p.name)}</b>, ${esc(p.area)}</li>`).join('')));
   const awardsStrip = $('#awards-strip');
   awardsStrip.append(el('h4', null, 'Awards & recognition'),
     el('ul', null, profile.awards.map((a) => `<li>${esc(a)}</li>`).join('')));
@@ -79,7 +79,7 @@ function render(profile) {
     item.append(head, el('div', 'tl-loc', esc(x.location)), el('p', 'tl-summary', esc(x.summary)),
       el('ul', 'tl-bullets', x.bullets.map((b) => `<li>${esc(b)}</li>`).join('')));
     if (x.more) {
-      const lock = el('button', 'tl-lock', '🔑 More detail in the Deeper Dive — with a key');
+      const lock = el('button', 'tl-lock', '🔑 More detail in the Deeper Dive, with a key');
       lock.addEventListener('click', () => $('#vault-section').scrollIntoView({ behavior: 'smooth' }));
       item.append(lock);
     }
@@ -198,7 +198,7 @@ function buildPalette(profile) {
   commands = [
     { name: 'Ask my AI', k: 'chat', run: () => openChat() },
     { name: 'Download CV (PDF)', k: 'pdf', run: () => { location.href = './Tarek_Karaman_CV.pdf'; } },
-    { name: 'Quick view — 90-second version', k: 'toggle', run: () => setRecruiter(!document.body.classList.contains('recruiter')) },
+    { name: 'Quick view, 90-second version', k: 'toggle', run: () => setRecruiter(!document.body.classList.contains('recruiter')) },
     { name: 'Deeper Dive (key required)', k: 'go', run: () => $('#vault-section').scrollIntoView({ behavior: 'smooth' }) },
     { name: 'Copy email address', k: 'copy', run: () => navigator.clipboard?.writeText(profile.email) },
     { name: 'Open LinkedIn', k: 'link', run: () => window.open(profile.linkedin, '_blank') },
@@ -248,10 +248,10 @@ document.addEventListener('keydown', (e) => {
 const colOverlay = $('#colophon-overlay');
 $('#colophon-btn').addEventListener('click', () => {
   $('#colophon-body').innerHTML = `
-    <p>This site was designed, written and engineered end-to-end with AI (Claude), directed by Tarek — which is the demonstration itself.</p>
-    <p><b>The concierge</b> answers from a structured corpus of his career — grounded, guardrailed, and honest about what it can't discuss. Hosted with a backend it runs on Claude; on static hosting it falls back to an on-device retrieval engine.</p>
-    <p><b>The Deeper Dive</b> uses real cryptography: private content is AES-256-GCM encrypted (PBKDF2, 310k iterations). The plain text never ships — not even in the public repository.</p>
-    <p><b>The stack</b> is deliberately lean: no framework, sub-second first paint, ⌘K navigation, dark/light, print-perfect, mobile-first — plus a lightweight CMS so the whole thing stays editable. Knowing when <i>not</i> to add technology is the point.</p>`;
+    <p>This site was designed, written and engineered end-to-end with AI (Claude), directed by Tarek, which is the demonstration itself.</p>
+    <p><b>The concierge</b> answers from a structured corpus of his career, grounded, guardrailed, and honest about what it can't discuss. Hosted with a backend it runs on Claude; on static hosting it falls back to an on-device retrieval engine.</p>
+    <p><b>The Deeper Dive</b> uses real cryptography: private content is AES-256-GCM encrypted (PBKDF2, 310k iterations). The plain text never ships, not even in the public repository.</p>
+    <p><b>The stack</b> is deliberately lean: no framework, sub-second first paint, ⌘K navigation, dark/light, print-perfect, mobile-first, plus a lightweight CMS so the whole thing stays editable. Knowing when <i>not</i> to add technology is the point.</p>`;
   colOverlay.hidden = false;
 });
 $('#colophon-close').addEventListener('click', () => { colOverlay.hidden = true; });

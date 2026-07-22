@@ -1,6 +1,6 @@
 // AI concierge. Two modes:
-//  1. API mode  — POST /api/chat (Cloudflare Pages Function → Claude), auto-detected.
-//  2. Local mode — on-device retrieval over the career corpus. Works on any static host.
+//  1. API mode , POST /api/chat (Cloudflare Pages Function → Claude), auto-detected.
+//  2. Local mode, on-device retrieval over the career corpus. Works on any static host.
 // The corpus is injected via setCorpus() so the CMS-edited content flows through.
 
 import { DEFAULT_CONTENT } from './data/content.js';
@@ -29,12 +29,12 @@ const topics = () => [
   },
   {
     keys: ['team', 'hire', 'hiring', 'build ai team', 'organisation', 'organization', 'delivery centre', 'delivery center', 'people', 'talent'],
-    answer: `Tarek builds AI organisations, not just AI projects. At WSP he stood up a dedicated AI engineering delivery centre — hiring the team and designing the operating model that ships AI products across internal and client programs. He founded the AI Academy (training hundreds of staff), and he's actively growing the team now — his recent LinkedIn activity is largely hiring posts for AI business partners and AI-first specialists. At Majid Al Futtaim he founded and scaled two Centres of Excellence. Earlier he managed 100+ technical staff at his own company.`,
+    answer: `Tarek builds AI organisations, not just AI projects. At WSP he stood up a dedicated AI engineering delivery centre, hiring the team and designing the operating model that ships AI products across internal and client programs. He founded the AI Academy (training hundreds of staff), and he's actively growing the team now, his recent LinkedIn activity is largely hiring posts for AI business partners and AI-first specialists. At Majid Al Futtaim he founded and scaled two Centres of Excellence. Earlier he managed 100+ technical staff at his own company.`,
     src: '#pulse'
   },
   {
     keys: ['leader', 'leadership', 'style', 'operate', 'philosophy', 'manage', 'culture', 'ready', 'cto', 'chief', 'executive', 'senior'],
-    answer: `Tarek operates at CTO / Chief AI Officer altitude: he's repeatedly built technology capability from zero to enterprise scale — strategy, governance, delivery organisation, commercial outcomes and adoption. His principles: build capability, not one-off projects; treat governance as an enabler (guardrails from day one are why 60,000 people could adopt AI compliantly); measure adoption, not deployment; partner at the top of the ecosystem (Microsoft, IBM, Google, PwC); and hold technology strategy accountable to the P&L. See 'How I operate' for the full picture.`,
+    answer: `Tarek operates at CTO / Chief AI Officer altitude: he's repeatedly built technology capability from zero to enterprise scale, strategy, governance, delivery organisation, commercial outcomes and adoption. His principles: build capability, not one-off projects; treat governance as an enabler (guardrails from day one are why 60,000 people could adopt AI compliantly); measure adoption, not deployment; partner at the top of the ecosystem (Microsoft, IBM, Google, PwC); and hold technology strategy accountable to the P&L. See 'How I operate' for the full picture.`,
     src: '#leadership'
   },
   {
@@ -49,17 +49,17 @@ const topics = () => [
   },
   {
     keys: ['governance', 'ethics', 'risk', 'compliance', 'responsible', 'guardrail', 'legal', 'safe'],
-    answer: `Governance is one of Tarek's differentiators. He founded WSP's AI Academy and embedded ethical and legal guardrails into every AI deployment — which is precisely what allowed adoption at 60,000+ user scale to stay compliant with global frameworks. His earlier work includes digital governance projects for Dubai Health Authority, Smart Dubai, ARAMCO and ADDED. His view: compliance done right speeds adoption, it doesn't slow it.`,
+    answer: `Governance is one of Tarek's differentiators. He founded WSP's AI Academy and embedded ethical and legal guardrails into every AI deployment, which is precisely what allowed adoption at 60,000+ user scale to stay compliant with global frameworks. His earlier work includes digital governance projects for Dubai Health Authority, Smart Dubai, ARAMCO and ADDED. His view: compliance done right speeds adoption, it doesn't slow it.`,
     src: '#leadership'
   },
   {
     keys: ['career', 'history', 'background', 'journey', 'experience', 'past', 'earlier', 'story', 'timeline'],
-    answer: () => `25+ years in five acts:\n\n${profile.experience.map((x) => `• ${x.period} — ${x.company}: ${x.role}`).join('\n')}\n\nThe pattern: each role built technology capability from the ground up and left behind an organisation that kept delivering.`,
+    answer: () => `25+ years in five acts:\n\n${profile.experience.map((x) => `• ${x.period}, ${x.company}: ${x.role}`).join('\n')}\n\nThe pattern: each role built technology capability from the ground up and left behind an organisation that kept delivering.`,
     src: '#journey'
   },
   {
     keys: ['partner', 'microsoft', 'ibm', 'google', 'pwc', 'ecosystem', 'vendor', 'gartner'],
-    answer: () => `Tarek maintains executive-level partnerships with ${profile.partnerships.map((p) => p.name).join(', ')} — spanning ${profile.partnerships.map((p) => p.area.toLowerCase()).join('; ')}. At MAF these included a regional GenAI Symposium he directed with Microsoft, IBM and Gartner.`,
+    answer: () => `Tarek maintains executive-level partnerships with ${profile.partnerships.map((p) => p.name).join(', ')}, spanning ${profile.partnerships.map((p) => p.area.toLowerCase()).join('; ')}. At MAF these included a regional GenAI Symposium he directed with Microsoft, IBM and Gartner.`,
     src: '#scorecard'
   },
   {
@@ -69,22 +69,22 @@ const topics = () => [
   },
   {
     keys: ['education', 'degree', 'study', 'university', 'qualification', 'school'],
-    answer: () => `Tarek holds a BA (Hons) from Middlesex University, London, and an Audio Media Engineering Diploma from SAE Institute, London. That said — 25 years of shipped outcomes are the stronger credential.`,
+    answer: () => `Tarek holds a BA (Hons) from Middlesex University, London, and an Audio Media Engineering Diploma from SAE Institute, London. That said, 25 years of shipped outcomes are the stronger credential.`,
     src: '#education'
   },
   {
     keys: ['contact', 'email', 'phone', 'reach', 'call', 'meet', 'connect', 'talk', 'conversation'],
-    answer: () => `Tarek is based in Dubai (British national, UAE resident) and always glad to connect with technology and transformation leaders.\n\n• Email: ${profile.email}\n• LinkedIn: linkedin.com/in/tarekkaraman\n• Phone: ${profile.phone}\n\nThe concierge just opens the door — the best conversations happen person to person.`,
+    answer: () => `Tarek is based in Dubai (British national, UAE resident) and always glad to connect with technology and transformation leaders.\n\n• Email: ${profile.email}\n• LinkedIn: linkedin.com/in/tarekkaraman\n• Phone: ${profile.phone}\n\nThe concierge just opens the door, the best conversations happen person to person.`,
     src: '#contact'
   },
   {
     keys: ['deeper dive', 'vault', 'password', 'access key', 'locked', 'key', 'private', 'more detail', 'case stud', 'portfolio', 'reference'],
-    answer: `The Deeper Dive is a key-gated area with selected case studies, a portfolio of work, and references — a little more than the public page, for people Tarek has shared a key with. It's AES-256 encrypted; the plain text never ships. If you have a key, use the Deeper Dive section; if not, just ask Tarek directly.`,
+    answer: `The Deeper Dive is a key-gated area with selected case studies, a portfolio of work, and references, a little more than the public page, for people Tarek has shared a key with. It's AES-256 encrypted; the plain text never ships. If you have a key, use the Deeper Dive section; if not, just ask Tarek directly.`,
     src: '#vault-section'
   },
   {
     keys: ['site', 'this website', 'how was this built', 'built with', 'stack', 'claude', 'ai built', 'made this'],
-    answer: `This site was designed and engineered end-to-end with AI (Claude), directed by Tarek — which is the demonstration: judgment about where AI creates value, guardrails by default, and lean engineering (no framework, sub-second paint, real encryption for private content, and a built-in CMS). Click 'how this site works' in the footer for the colophon.`,
+    answer: `This site was designed and engineered end-to-end with AI (Claude), directed by Tarek, which is the demonstration: judgment about where AI creates value, guardrails by default, and lean engineering (no framework, sub-second paint, real encryption for private content, and a built-in CMS). Click 'how this site works' in the footer for the colophon.`,
     src: '#contact'
   },
   {
@@ -103,10 +103,10 @@ function localAnswer(q) {
   }
   if (best) return { text: typeof best.answer === 'function' ? best.answer() : best.answer, src: best.src };
   if (/^(hi|hello|hey|salaam|salam|good (morning|afternoon|evening))\b/.test(lq)) {
-    return { text: `Hello! I'm Tarek's AI concierge — trained on his career and happy to answer what a first conversation would cover. Try a suggested question below, or ask about scale, leadership, governance, or his work at WSP and MAF.`, src: null };
+    return { text: `Hello! I'm Tarek's AI concierge, trained on his career and happy to answer what a first conversation would cover. Try a suggested question below, or ask about scale, leadership, governance, or his work at WSP and MAF.`, src: null };
   }
   return {
-    text: `That's outside what I can speak to — I'm scoped to Tarek's career, leadership and how to reach him, and I don't guess or improvise facts (an AI leader's concierge shouldn't hallucinate). Try asking about his scale of delivery, how he builds AI teams, or his work at WSP and MAF.`,
+    text: `That's outside what I can speak to, I'm scoped to Tarek's career, leadership and how to reach him, and I don't guess or improvise facts (an AI leader's concierge shouldn't hallucinate). Try asking about his scale of delivery, how he builds AI teams, or his work at WSP and MAF.`,
     src: null
   };
 }
@@ -119,8 +119,8 @@ async function detectApi() {
     apiMode = r.ok && (r.headers.get('content-type') || '').includes('json') && (await r.json()).ok === true;
   } catch { apiMode = false; }
   $('#chat-mode').textContent = apiMode
-    ? '● live — powered by Claude, grounded in Tarek’s career corpus'
-    : '● on-device mode — grounded retrieval, zero data leaves your browser. (Full Claude mode activates on the Cloudflare deployment.)';
+    ? '● live, powered by Claude, grounded in Tarek’s career corpus'
+    : '● on-device mode, grounded retrieval, zero data leaves your browser. (Full Claude mode activates on the Cloudflare deployment.)';
   return apiMode;
 }
 
@@ -175,7 +175,7 @@ export function openChat() {
   setTimeout(() => $('#chat-input').focus({ preventScroll: true }), 500);
   if (!booted) {
     booted = true;
-    addMsg('msg-ai', `Welcome — I'm Tarek's AI concierge. I answer from his verified career record: 25+ years, currently Head of AI at WSP Middle East. Ask me what you'd cover in a first conversation.`);
+    addMsg('msg-ai', `Welcome, I'm Tarek's AI concierge. I answer from his verified career record: 25+ years, currently Head of AI at WSP Middle East. Ask me what you'd cover in a first conversation.`);
   }
 }
 

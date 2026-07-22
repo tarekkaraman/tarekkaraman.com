@@ -298,6 +298,15 @@ body {
 .vault-portfolio { display: grid; grid-template-columns: repeat(2,1fr); gap: 12px; margin-top: 10px; }
 .vault-pcard { border: 1px solid var(--line-soft); border-radius: var(--radius); padding: 16px 18px; background: var(--panel); }
 .vault-pcard b { display: block; margin-bottom: 4px; } .vault-pcard span { color: var(--text-dim); font-size: .88rem; }
+.refs-gate { margin-top: 26px; padding-top: 20px; border-top: 1px dashed var(--line); }
+.refs-lock { font-family: var(--font-mono); font-size: .68rem; color: var(--accent); border: 1px solid var(--line); padding: 2px 8px; border-radius: 999px; vertical-align: middle; margin-left: 6px; }
+.refs-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 12px; }
+.ref-card { border: 1px solid var(--line-soft); border-radius: var(--radius); padding: 16px 18px; background: var(--panel); display: flex; flex-direction: column; gap: 3px; }
+.ref-card b { font-size: 1rem; }
+.ref-role { color: var(--text); font-size: .88rem; }
+.ref-rel { color: var(--text-dim); font-size: .84rem; }
+.ref-contact { color: var(--accent); font-size: .82rem; font-family: var(--font-mono); margin-top: 4px; }
+@media (max-width: 900px) { .refs-list { grid-template-columns: 1fr; } }
 
 /* ── Education / contact ── */
 .edu-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }

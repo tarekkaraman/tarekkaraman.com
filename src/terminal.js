@@ -1,4 +1,4 @@
-// Hidden terminal — the easter egg for the engineers on the panel.
+// Hidden terminal, the easter egg for the engineers on the panel.
 // Reachable via ⌘K → "terminal", or typing "tk!" anywhere.
 
 import { DEFAULT_CONTENT } from './data/content.js';
@@ -9,7 +9,7 @@ export function setTerminalData(c) { profile = c; }
 
 const files = () => ({
   'about.txt': profile.about,
-  'experience.log': profile.experience.map((x) => `[${x.period}] ${x.company} — ${x.role}\n  ${x.bullets.join('\n  ')}`).join('\n\n'),
+  'experience.log': profile.experience.map((x) => `[${x.period}] ${x.company}, ${x.role}\n  ${x.bullets.join('\n  ')}`).join('\n\n'),
   'skills.yaml': profile.skills.map((s) => `- ${s}`).join('\n'),
   'contact.vcf': `EMAIL: ${profile.email}\nLINKEDIN: ${profile.linkedin}\nPHONE: ${profile.phone}\nLOCATION: ${profile.location}`,
   'deeper-dive.enc': '�AES-256-GCM�… nice try. Keys are shared by Tarek in person.'
@@ -34,12 +34,12 @@ function run(cmd) {
     case 'help': return HELP;
     case 'ls': return Object.keys(F).join('\n');
     case 'cat': return F[arg] || `cat: ${arg || '<file>'}: No such file`;
-    case 'whoami': return `${profile.name} — ${profile.headline}\n${profile.role}`;
+    case 'whoami': return `${profile.name}, ${profile.headline}\n${profile.role}`;
     case 'stats': return profile.stats.map((s) => `${(s.prefix || '') + s.value.toLocaleString('en-US') + (s.suffix || '')}  ${s.label}`).join('\n');
     case 'sudo': return arg === 'hire' ? `[sudo] password for recruiter: ********\nPrivileges granted. Next step: ${profile.email}` : `sudo: ${arg}: command not found`;
     case 'clear': $('#terminal-body').textContent = ''; return null;
     case 'exit': closeTerminal(); return null;
-    default: return `zsh: command not found: ${c} — type 'help'`;
+    default: return `zsh: command not found: ${c}, type 'help'`;
   }
 }
 
@@ -57,7 +57,7 @@ export function openTerminal() {
   ov.hidden = false;
   const body = $('#terminal-body');
   if (!body.textContent) {
-    print(`Last login: 25 years of shipping — welcome to the hidden layer.`);
+    print(`Last login: 25 years of shipping, welcome to the hidden layer.`);
     print(`You found it. Type 'help' to explore Tarek's career the engineer's way.`);
   }
   $('#terminal-input').focus();

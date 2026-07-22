@@ -2,8 +2,9 @@ node_modules/
 dist/
 .DS_Store
 
-# Confidential — never commit
+# Private — never commit
 private/
 .vault-pass
+.refs-pass
 .env
 .env.*
