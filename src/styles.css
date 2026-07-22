@@ -271,14 +271,20 @@ body {
 .pulse-items { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
 .pulse-item { background: var(--panel); border: 1px solid var(--line-soft); border-radius: var(--radius); padding: 16px 18px; box-shadow: var(--shadow-sm); cursor: pointer; transition: border-color .2s, transform .15s var(--ease); }
 .pulse-item:hover { border-color: var(--accent); transform: translateY(-2px); }
-.pulse-item .row1 { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
-.pulse-verb { font-size: .68rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; padding: 3px 9px; border-radius: 999px; color: #fff; }
+.pulse-item .row1 { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; flex-wrap: wrap; }
+.pulse-verb { font-size: .66rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; padding: 3px 9px; border-radius: 999px; color: #fff; }
 .pv-liked { background: #e0245e; } .pv-commented { background: #1d9bf0; } .pv-reshared { background: #17bf63; } .pv-posted { background: #7856ff; }
+.pulse-item .verb-actor { font-weight: 600; font-size: .86rem; }
 .pulse-item .when { font-family: var(--font-mono); font-size: .72rem; color: var(--text-dim); margin-left: auto; }
-.pulse-item .actor { font-weight: 600; font-size: .92rem; }
-.pulse-item .snip { color: var(--text-dim); font-size: .87rem; margin: 4px 0 0; max-height: 0; overflow: hidden; transition: max-height .3s var(--ease); }
-.pulse-item.open .snip { max-height: 200px; margin-top: 8px; }
-.pulse-item .theme { display: inline-block; font-size: .72rem; color: var(--accent); margin-top: 8px; font-family: var(--font-mono); }
+.pulse-item .pulse-re { font-size: .78rem; color: var(--text-dim); font-style: italic; margin-bottom: 8px; }
+.pulse-item .pulse-quote { color: var(--text); font-size: .89rem; line-height: 1.55; white-space: pre-wrap;
+  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; }
+.pulse-item.open .pulse-quote { -webkit-line-clamp: unset; }
+.pulse-item .pulse-quote.comment { padding-left: 12px; border-left: 2px solid var(--accent); color: var(--text-dim); }
+.pulse-foot { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; }
+.pulse-item .theme { font-size: .72rem; color: var(--accent); font-family: var(--font-mono); }
+.pulse-item .tap-hint { font-size: .68rem; color: var(--text-dim); font-family: var(--font-mono); opacity: .7; }
+.pulse-item.open .tap-hint { display: none; }
 .pulse-note { color: var(--text-dim); font-size: .85rem; margin-top: 14px; }
 
 /* ── Vault / Deeper Dive ── */

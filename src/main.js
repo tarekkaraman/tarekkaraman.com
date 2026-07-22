@@ -105,6 +105,8 @@ function render(profile) {
     Object.assign(el('a', null, 'View LinkedIn →'), { href: profile.linkedin, target: '_blank', rel: 'noopener' }));
 
   const verbs = { liked: 'Liked', commented: 'Commented', reshared: 'Reshared', posted: 'Posted' };
+  const verbLabel = (e) => e.type === 'commented' ? `Commented on ${esc(e.actor)}`
+    : e.type === 'posted' ? 'Posted' : `${verbs[e.type]} ${esc(e.actor)}`;
   const themesSet = ['All', ...new Set(lp.engagement.map((e) => e.theme))];
   const filters = $('#pulse-filters');
   const itemsWrap = $('#pulse-items');
@@ -113,10 +115,15 @@ function render(profile) {
     itemsWrap.innerHTML = '';
     lp.engagement.filter((e) => activeFilter === 'All' || e.theme === activeFilter).forEach((e) => {
       const card = el('div', 'pulse-item');
+      const quote = e.type === 'commented'
+        ? `<div class="pulse-quote comment">“${esc(e.text)}”</div>`
+        : `<div class="pulse-quote">${esc(e.text)}${e.impressions ? `\n\n${e.impressions.toLocaleString('en-US')} impressions` : ''}</div>`;
       card.innerHTML =
-        `<div class="row1"><span class="pulse-verb pv-${e.type}">${verbs[e.type] || e.type}</span><span class="when">${esc(e.when)}</span></div>` +
-        `<div class="actor">${esc(e.actor)}</div><div class="snip">${esc(e.text)}${e.impressions ? ` · ${e.impressions.toLocaleString('en-US')} impressions` : ''}</div>` +
-        `<span class="theme">#${esc(e.theme.replace(/\s+/g, ''))}</span>`;
+        `<div class="row1"><span class="pulse-verb pv-${e.type}">${verbs[e.type] || e.type}</span>` +
+        `<span class="verb-actor">${verbLabel(e)}</span><span class="when">${esc(e.when)}</span></div>` +
+        (e.re ? `<div class="pulse-re">${esc(e.re)}</div>` : '') +
+        quote +
+        `<div class="pulse-foot"><span class="theme">#${esc(e.theme.replace(/\s+/g, ''))}</span><span class="tap-hint">tap to expand</span></div>`;
       card.addEventListener('click', () => card.classList.toggle('open'));
       itemsWrap.append(card);
     });
