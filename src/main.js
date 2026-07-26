@@ -116,10 +116,6 @@ function render(profile) {
         `<b>${esc(m.title)}</b><span class="media-desc">${esc(m.desc || '')}</span></div>`;
       grid.append(card);
     });
-    const locked = el('button', 'media-card media-locked reveal');
-    locked.innerHTML = `<div class="media-thumb media-thumb-ph"><span>🔑</span></div><div class="media-body"><span class="media-tag">Private collection</span><b>More behind the Deeper Dive key</b><span class="media-desc">Videos, decks and work I only share directly.</span></div>`;
-    locked.addEventListener('click', () => $('#vault-section').scrollIntoView({ behavior: 'smooth' }));
-    grid.append(locked);
   }
 
   const lp = profile.linkedinPulse;

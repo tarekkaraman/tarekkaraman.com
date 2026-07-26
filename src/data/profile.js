@@ -44,7 +44,7 @@ export const profile = {
 
   stats: [
     { value: 25, suffix: '+', label: 'Years experience' },
-    { value: 60000, suffix: '+', label: 'People enabled with AI, across WSP & MAF' },
+    { value: 60000, suffix: '+', label: 'People enabled on AI in the past 4 years' },
     { value: 8, suffix: '+', label: 'Enterprise AI tools shipped' },
     { value: 20, prefix: '$', suffix: 'M+', label: 'Programs delivered' }
   ],
@@ -207,15 +207,14 @@ export const profile = {
 
   education: [
     { title: 'BA (Hons)', place: 'Middlesex University, London' },
-    { title: 'Audio Media Engineering Diploma', place: 'SAE Institute, London. The engineering roots that later became a 6,000-track digital music platform.' },
-    { title: 'A-Levels', place: 'Sociology, Business Studies, IT & General Studies' },
-    { title: 'Executive learning', place: 'Continuous development alongside Microsoft, IBM and Gartner, including directing a regional GenAI Symposium.' }
+    { title: 'Audio Media Engineering Diploma', place: 'SAE Institute, London' },
+    { title: 'A-Levels & GCSEs', place: 'Sociology, Business Studies and IT at A-Level; 10 GCSEs including Mathematics and English' }
   ],
 
   interests: [
-    'Generative AI & emerging technology: a hands-on builder, not just a sponsor. This site, designed and engineered with AI under his direction, is one of his experiments.',
-    'Enterprise innovation & R&D: from founding a music-tech platform in 2006 to standing up AI accelerators today, the pattern is building what does not exist yet.',
-    'Mentoring & capability building: founded the AI Academy at WSP and has trained hundreds of professionals; believes teams that outlast you are the real legacy.'
+    'Builds, doesn\'t just sponsor: this site was engineered end-to-end with AI under his direction. Proof of concept, not a slide deck.',
+    'Founds things that didn\'t exist: a digital music-publishing platform in 2006, enterprise AI accelerators today. Same instinct, different decade.',
+    'Trains the next generation: founded WSP\'s AI Academy and put hundreds of professionals through it. The teams he leaves behind are the real legacy.'
   ],
 
   // Framing for the key-gated area.
