@@ -97,6 +97,28 @@ function render(profile) {
   profile.skills.forEach((s) => skills.append(el('span', null, esc(s))));
 
   /* LinkedIn pulse */
+  /* Media & highlights */
+  const mediaItems = (profile.media || []).filter((m) => m.url);
+  if (mediaItems.length) {
+    $('#media').hidden = false;
+    const grid = $('#media-grid');
+    mediaItems.forEach((m) => {
+      const card = el('a', 'media-card reveal');
+      card.href = m.url; card.target = '_blank'; card.rel = 'noopener';
+      const thumb = m.thumb
+        ? `<div class="media-thumb" style="background-image:url('${m.thumb.replace(/'/g, '%27')}')"></div>`
+        : `<div class="media-thumb media-thumb-ph"><span>${m.kind === 'video' ? '▶' : '✦'}</span></div>`;
+      card.innerHTML = thumb +
+        `<div class="media-body"><span class="media-tag">${esc(m.tag || '')}${m.kind === 'video' ? ' · video' : ''}</span>` +
+        `<b>${esc(m.title)}</b><span class="media-desc">${esc(m.desc || '')}</span></div>`;
+      grid.append(card);
+    });
+    const locked = el('button', 'media-card media-locked reveal');
+    locked.innerHTML = `<div class="media-thumb media-thumb-ph"><span>🔑</span></div><div class="media-body"><span class="media-tag">Private collection</span><b>More behind the Deeper Dive key</b><span class="media-desc">Videos, decks and work I only share directly.</span></div>`;
+    locked.addEventListener('click', () => $('#vault-section').scrollIntoView({ behavior: 'smooth' }));
+    grid.append(locked);
+  }
+
   const lp = profile.linkedinPulse;
   $('#pulse-intro').textContent = lp.intro || '';
   const pstat = $('#pulse-stat');
@@ -111,22 +133,32 @@ function render(profile) {
   const filters = $('#pulse-filters');
   const itemsWrap = $('#pulse-items');
   let activeFilter = 'All';
+  let showAll = false;
+  const visibleCount = lp.visibleCount || 4;
   function renderPulse() {
     itemsWrap.innerHTML = '';
-    lp.engagement.filter((e) => activeFilter === 'All' || e.theme === activeFilter).forEach((e) => {
+    const filtered = lp.engagement.filter((e) => activeFilter === 'All' || e.theme === activeFilter);
+    const shown = showAll ? filtered : filtered.slice(0, visibleCount);
+    shown.forEach((e) => {
       const card = el('div', 'pulse-item');
       const quote = e.type === 'commented'
         ? `<div class="pulse-quote comment">“${esc(e.text)}”</div>`
         : `<div class="pulse-quote">${esc(e.text)}${e.impressions ? `\n\n${e.impressions.toLocaleString('en-US')} impressions` : ''}</div>`;
+      const link = e.url ? `<a class="pulse-link" href="${esc(e.url)}" target="_blank" rel="noopener">View on LinkedIn ↗</a>` : '';
       card.innerHTML =
         `<div class="row1"><span class="pulse-verb pv-${e.type}">${verbs[e.type] || e.type}</span>` +
         `<span class="verb-actor">${verbLabel(e)}</span><span class="when">${esc(e.when)}</span></div>` +
         (e.re ? `<div class="pulse-re">${esc(e.re)}</div>` : '') +
         quote +
-        `<div class="pulse-foot"><span class="theme">#${esc(e.theme.replace(/\s+/g, ''))}</span><span class="tap-hint">tap to expand</span></div>`;
-      card.addEventListener('click', () => card.classList.toggle('open'));
+        `<div class="pulse-foot"><span class="theme">#${esc(e.theme.replace(/\s+/g, ''))}</span>${link}<span class="tap-hint">tap to expand</span></div>`;
+      card.addEventListener('click', (ev) => { if (ev.target.tagName !== 'A') card.classList.toggle('open'); });
       itemsWrap.append(card);
     });
+    if (filtered.length > visibleCount) {
+      const more = el('button', 'pulse-more', showAll ? 'Show fewer ↑' : `Show all ${filtered.length} ↓`);
+      more.addEventListener('click', () => { showAll = !showAll; renderPulse(); });
+      itemsWrap.append(more);
+    }
   }
   themesSet.forEach((t) => {
     const b = el('button', t === 'All' ? 'on' : '', esc(t));
@@ -203,7 +235,8 @@ let sel = 0;
 
 function buildPalette(profile) {
   commands = [
-    { name: 'Ask my AI', k: 'chat', run: () => openChat() },
+    { name: 'Ask AI about me', k: 'chat', run: () => openChat() },
+    { name: 'Jump: Media & highlights', k: 'go', run: () => $('#media').scrollIntoView({ behavior: 'smooth' }) },
     { name: 'Download CV (PDF)', k: 'pdf', run: () => { location.href = './Tarek_Karaman_CV.pdf'; } },
     { name: 'Quick view, 90-second version', k: 'toggle', run: () => setRecruiter(!document.body.classList.contains('recruiter')) },
     { name: 'Deeper Dive (key required)', k: 'go', run: () => $('#vault-section').scrollIntoView({ behavior: 'smooth' }) },

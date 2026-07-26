@@ -25,6 +25,8 @@ Experience:
 ${p.experience.map((x) => `- ${x.period} | ${x.company} — ${x.role} (${x.location}). ${x.summary} Highlights: ${x.bullets.join('; ')}`).join('\n')}
 Deep context — WSP: ${p.deepKnowledge?.wsp || ''}
 Deep context — MAF: ${p.deepKnowledge?.maf || ''}
+${(p.knowledgeBase || []).map((k) => `Additional knowledge — ${k.title}: ${k.body}`).join('\n')}
+Note on phrasing: describe the Copilot work as "rolled out Microsoft Copilot across the region"; do not quote user counts for it.
 Awards: ${p.awards.join(' | ')}
 Partnerships: ${p.partnerships.map((x) => `${x.name} (${x.area})`).join(', ')}
 Skills: ${p.skills.join(', ')}

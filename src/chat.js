@@ -13,18 +13,16 @@ export function setCorpus(c) { profile = c; }
 
 const starterChips = [
   'What scale has Tarek operated at?',
+  'What enterprise AI tools has he shipped?',
   'How does he build AI teams?',
-  'What kind of leader is he?',
-  'What did he do at WSP and MAF?',
-  'How does he think about AI governance?',
-  'How do I reach him?'
+  'What did he do at WSP and MAF?'
 ];
 
 /* ─── Local retrieval brain ─── */
 const topics = () => [
   {
     keys: ['scale', 'scope', 'size', 'budget', 'p&l', 'pnl', 'how big', 'numbers', 'users', 'impact', 'results'],
-    answer: `Scale is the through-line of Tarek's career:\n\n• 60,000+ users enabled on Microsoft Copilot across WSP's region and beyond\n• 8+ enterprise AI tools shipped within six months of standing up the AI Accelerator\n• Client AI programs grown from pilots to multi-year engagements valued at $20M+\n• A dedicated AI engineering delivery centre built and scaled from zero\n• Earlier: 15X revenue growth in year one at Solve IT, and a 100+ person technical team at his own venture`,
+    answer: `Scale is the through-line of Tarek's career:\n\n• Rolled out Microsoft Copilot across WSP's Middle East region\n• 8+ enterprise AI tools shipped within six months of standing up the AI Accelerator\n• Client AI programs grown from pilots to multi-year engagements valued at $20M+\n• A dedicated AI engineering delivery centre built and scaled from zero\n• Earlier: 15X revenue growth in year one at Solve IT, and a 100+ person technical team at his own venture`,
     src: '#scorecard'
   },
   {
@@ -34,8 +32,13 @@ const topics = () => [
   },
   {
     keys: ['leader', 'leadership', 'style', 'operate', 'philosophy', 'manage', 'culture', 'ready', 'cto', 'chief', 'executive', 'senior'],
-    answer: `Tarek operates at CTO / Chief AI Officer altitude: he's repeatedly built technology capability from zero to enterprise scale, strategy, governance, delivery organisation, commercial outcomes and adoption. His principles: build capability, not one-off projects; treat governance as an enabler (guardrails from day one are why 60,000 people could adopt AI compliantly); measure adoption, not deployment; partner at the top of the ecosystem (Microsoft, IBM, Google, PwC); and hold technology strategy accountable to the P&L. See 'How I operate' for the full picture.`,
+    answer: `Tarek operates at CTO / Chief AI Officer altitude: he's repeatedly built technology capability from zero to enterprise scale, strategy, governance, delivery organisation, commercial outcomes and adoption. His principles: build capability, not one-off projects; treat governance as an enabler (guardrails from day one are why a whole region could adopt AI compliantly); measure adoption, not deployment; partner at the top of the ecosystem (Microsoft, IBM, Google, PwC); and hold technology strategy accountable to the P&L. See 'How I operate' for the full picture.`,
     src: '#leadership'
+  },
+  {
+    keys: ['tools', 'shipped', 'built', 'products', 'enterprise ai tools', 'bid', 'automation', 'what has he made'],
+    answer: `Within six months of standing up WSP's AI Accelerator, Tarek's team shipped 8+ enterprise AI tools: bid automation, resourcing, data insights and project planning, improving bid-win rates and cutting delivery effort. On the client side: AI-powered water management, city digital twins and environmental simulation platforms, grown from pilots into multi-year programs valued at $20M+. At MAF he launched MAF GPT, a secure internal generative-AI assistant, plus a region-leading Microsoft Copilot deployment.`,
+    src: '#journey'
   },
   {
     keys: ['wsp', 'current', 'now', 'today', 'accelerator', 'water', 'digital twin', 'twin'],
@@ -49,7 +52,7 @@ const topics = () => [
   },
   {
     keys: ['governance', 'ethics', 'risk', 'compliance', 'responsible', 'guardrail', 'legal', 'safe'],
-    answer: `Governance is one of Tarek's differentiators. He founded WSP's AI Academy and embedded ethical and legal guardrails into every AI deployment, which is precisely what allowed adoption at 60,000+ user scale to stay compliant with global frameworks. His earlier work includes digital governance projects for Dubai Health Authority, Smart Dubai, ARAMCO and ADDED. His view: compliance done right speeds adoption, it doesn't slow it.`,
+    answer: `Governance is one of Tarek's differentiators. He founded WSP's AI Academy and embedded ethical and legal guardrails into every AI deployment, which is precisely what allowed a region-wide Copilot rollout to stay compliant with global frameworks. His earlier work includes digital governance projects for Dubai Health Authority, Smart Dubai, ARAMCO and ADDED. His view: compliance done right speeds adoption, it doesn't slow it.`,
     src: '#leadership'
   },
   {
@@ -102,11 +105,18 @@ function localAnswer(q) {
     if (score > bestScore) { best = t; bestScore = score; }
   }
   if (best) return { text: typeof best.answer === 'function' ? best.answer() : best.answer, src: best.src };
+
+  // CMS-added knowledge base entries (titles act as keywords)
+  for (const kb of profile.knowledgeBase || []) {
+    const words = (kb.title || '').toLowerCase().split(/\s+/).filter((w) => w.length > 3);
+    if (words.some((w) => lq.includes(w))) return { text: kb.body, src: null };
+  }
+
   if (/^(hi|hello|hey|salaam|salam|good (morning|afternoon|evening))\b/.test(lq)) {
-    return { text: `Hello! I'm Tarek's AI concierge, trained on his career and happy to answer what a first conversation would cover. Try a suggested question below, or ask about scale, leadership, governance, or his work at WSP and MAF.`, src: null };
+    return { text: `Hello! Ask me anything about Tarek's career: the scale he's operated at, the AI tools he's shipped, or the teams he's built. I stick to the facts, and I'll tell you when something's above my pay grade.`, src: null };
   }
   return {
-    text: `That's outside what I can speak to, I'm scoped to Tarek's career, leadership and how to reach him, and I don't guess or improvise facts (an AI leader's concierge shouldn't hallucinate). Try asking about his scale of delivery, how he builds AI teams, or his work at WSP and MAF.`,
+    text: `That one's outside my brief. I only talk about Tarek's career and leadership, and I never make things up (an AI leader's AI shouldn't hallucinate). Try the scale he's operated at, the tools he's shipped, or his work at WSP and MAF.`,
     src: null
   };
 }
@@ -119,8 +129,8 @@ async function detectApi() {
     apiMode = r.ok && (r.headers.get('content-type') || '').includes('json') && (await r.json()).ok === true;
   } catch { apiMode = false; }
   $('#chat-mode').textContent = apiMode
-    ? '● live, powered by Claude, grounded in Tarek’s career corpus'
-    : '● on-device mode, grounded retrieval, zero data leaves your browser. (Full Claude mode activates on the Cloudflare deployment.)';
+    ? '● live, powered by Claude and grounded in Tarek’s verified career record'
+    : '● instant answers, straight from Tarek’s verified career record';
   return apiMode;
 }
 
@@ -175,7 +185,7 @@ export function openChat() {
   setTimeout(() => $('#chat-input').focus({ preventScroll: true }), 500);
   if (!booted) {
     booted = true;
-    addMsg('msg-ai', `Welcome, I'm Tarek's AI concierge. I answer from his verified career record: 25+ years, currently Head of AI at WSP Middle East. Ask me what you'd cover in a first conversation.`);
+    addMsg('msg-ai', `Hi, I'm the AI that knows Tarek's career inside out: 25+ years, currently Head of AI at WSP Middle East. Ask me anything, or tap a question below to get going.`);
   }
 }
 

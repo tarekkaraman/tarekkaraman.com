@@ -29,9 +29,10 @@
       <a class="brand" href="#top">TK<span class="brand-dot">.</span></a>
       <nav class="topnav" aria-label="Sections">
         <a href="#scorecard">Scorecard</a>
-        <a href="#concierge">Ask my AI</a>
+        <a href="#concierge">Ask AI</a>
         <a href="#journey">Journey</a>
         <a href="#leadership">Leadership</a>
+        <a href="#media">Media</a>
         <a href="#pulse">Pulse</a>
         <a href="#vault-section">Deeper Dive</a>
         <a href="#contact">Contact</a>
@@ -55,7 +56,7 @@
         <p class="hero-headline reveal">I build <em class="grad-text">enterprise AI capability</em> from the ground up:<br class="wide-only" /> strategy, delivery organisations, and adoption at scale.</p>
         <p class="hero-sub reveal">25+ years across government, infrastructure and Fortune 500. Currently leading AI for WSP across the Middle East &amp; Africa. This site is itself a working demonstration: the AI concierge below is trained on my career and answers honestly, and it knows what it isn't allowed to say.</p>
         <div class="hero-ctas reveal">
-          <button class="btn btn-primary" data-open-chat>Ask my AI ✦</button>
+          <button class="btn btn-primary" data-open-chat>Ask AI about me ✦</button>
           <a class="btn btn-ghost" href="./Tarek_Karaman_CV.pdf" download>Download CV</a>
           <button class="voice-btn" id="voice-btn" hidden>
             <span class="ico" id="voice-ico">▶</span>
@@ -76,15 +77,15 @@
       </div>
     </section>
 
-    <!-- ── AI concierge ── -->
+    <!-- ── Ask AI about me ── -->
     <section class="section" id="concierge">
-      <h2 class="section-title"><span>02</span> The AI concierge</h2>
-      <p class="section-lede">Trained on my full career corpus. Ask it what a first conversation would cover: scope, outcomes, how I build AI organisations. It cites the facts, declines what's private, and points you to <a href="#vault-section">the Deeper Dive</a> or <a href="#contact">the real me</a> when it should.</p>
+      <h2 class="section-title"><span>02</span> Ask AI about me</h2>
+      <p class="section-lede">Skip the reading. This AI knows my whole career and answers like a well-briefed chief of staff: straight, factual, and honest about what it can't share. Go on, ask it something you'd ask in a first meeting.</p>
       <div class="chat-shell" id="chat-shell">
         <div class="chat-log" id="chat-log" aria-live="polite"></div>
         <div class="chat-chips" id="chat-chips"></div>
         <form class="chat-input-row" id="chat-form">
-          <input id="chat-input" type="text" placeholder="Ask about Tarek's experience, scale, leadership style…" autocomplete="off" />
+          <input id="chat-input" type="text" placeholder="Ask anything about Tarek's career…" autocomplete="off" />
           <button class="btn btn-primary" type="submit">Ask</button>
         </form>
         <p class="chat-mode" id="chat-mode"></p>
@@ -107,9 +108,16 @@
       </div>
     </section>
 
+    <!-- ── Media ── -->
+    <section class="section" id="media" hidden>
+      <h2 class="section-title"><span>05</span> Media &amp; highlights</h2>
+      <p class="section-lede">Moments worth seeing: launches, awards and coverage from the journey. A further collection sits behind <a href="#vault-section">the Deeper Dive</a> key.</p>
+      <div class="media-grid" id="media-grid"></div>
+    </section>
+
     <!-- ── LinkedIn pulse ── -->
     <section class="section" id="pulse">
-      <h2 class="section-title"><span>05</span> LinkedIn pulse</h2>
+      <h2 class="section-title"><span>06</span> LinkedIn pulse</h2>
       <p class="section-lede" id="pulse-intro"></p>
       <div class="pulse-top">
         <div class="pulse-stat" id="pulse-stat"></div>
@@ -121,7 +129,7 @@
 
     <!-- ── Deeper Dive (key-gated, encrypted) ── -->
     <section class="section" id="vault-section">
-      <h2 class="section-title"><span>06</span> <span id="dd-title">Deeper Dive</span></h2>
+      <h2 class="section-title"><span>07</span> <span id="dd-title">Deeper Dive</span></h2>
       <p class="section-lede" id="dd-intro"></p>
       <div class="vault" id="vault">
         <form class="vault-form" id="vault-form">
@@ -135,13 +143,13 @@
 
     <!-- ── Education & interests ── -->
     <section class="section section-tight" id="education">
-      <h2 class="section-title"><span>07</span> Education &amp; interests</h2>
+      <h2 class="section-title"><span>08</span> Education &amp; interests</h2>
       <div class="edu-grid" id="edu-grid"></div>
     </section>
 
     <!-- ── Contact ── -->
     <section class="section contact" id="contact">
-      <h2 class="section-title"><span>08</span> Let's talk</h2>
+      <h2 class="section-title"><span>09</span> Let's talk</h2>
       <p class="section-lede">The concierge is good, but the best conversations happen person to person.</p>
       <div class="contact-cards" id="contact-cards"></div>
       <p class="contact-note">Always glad to connect with fellow technology and transformation leaders.</p>
@@ -152,7 +160,7 @@
     <p>© <span id="year"></span> Tarek Karaman · Designed &amp; built with AI · <button class="linklike" id="colophon-btn">how this site works</button> · <span class="mono">⌘K</span> for the command palette</p>
   </footer>
 
-  <button class="chat-fab" id="chat-fab" data-open-chat title="Ask my AI">✦</button>
+  <button class="chat-fab" id="chat-fab" data-open-chat title="Ask AI about me">✦</button>
 
   <div class="palette-overlay" id="palette-overlay" hidden>
     <div class="palette" role="dialog" aria-label="Command palette">
