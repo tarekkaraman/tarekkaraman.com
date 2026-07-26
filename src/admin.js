@@ -30,13 +30,19 @@ async function detectMode() {
 }
 
 /* ── Gate ── */
+// In live mode the key is verified server-side against ADMIN_KEY.
+// In file/local mode there is no server, so the editor unlocks with the
+// local editor key below. (Publishing still always goes through git or the
+// server key, which are the real gates.)
+const LOCAL_EDITOR_KEY = 'TarekKaraman1982';
 async function unlock(key) {
   adminKey = key;
   if (mode.live) {
-    // verify against server
     const r = await fetch('./api/content', { method: 'POST', headers: { 'content-type': 'application/json', 'x-admin-key': key }, body: JSON.stringify({ checkAuth: true }) });
     const d = await r.json().catch(() => ({}));
     if (!d.ok) return false;
+  } else if (key !== LOCAL_EDITOR_KEY) {
+    return false;
   }
   return true;
 }
@@ -105,6 +111,43 @@ function selectField(obj, key, label, options) {
   options.forEach((o) => { const op = el('option', null, o); op.value = o; if (obj[key] === o) op.selected = true; sel.append(op); });
   sel.addEventListener('change', () => { obj[key] = sel.value; });
   f.append(sel);
+  return f;
+}
+
+// Thumbnail upload: downscales to ~640px JPEG and stores inline as a data URL
+// (kept small so content.json / KV stays light).
+function thumbField(obj) {
+  const f = el('div', 'field');
+  f.append(el('label', null, 'Thumbnail image (optional)'));
+  const row = el('div');
+  row.style.cssText = 'display:flex;gap:10px;align-items:center';
+  const preview = el('div');
+  const setPreview = () => {
+    preview.style.cssText = 'width:96px;height:60px;border-radius:8px;border:1px solid var(--line-soft);background-size:cover;background-position:center;flex:none;' +
+      (obj.thumb ? `background-image:url('${obj.thumb}')` : 'background:var(--bg-2)');
+  };
+  setPreview();
+  const file = el('input');
+  file.type = 'file'; file.accept = 'image/*';
+  file.addEventListener('change', () => {
+    const fl = file.files?.[0];
+    if (!fl) return;
+    const img = new Image();
+    img.onload = () => {
+      const scale = Math.min(1, 640 / img.width);
+      const c = document.createElement('canvas');
+      c.width = Math.round(img.width * scale); c.height = Math.round(img.height * scale);
+      c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+      obj.thumb = c.toDataURL('image/jpeg', 0.8);
+      setPreview();
+    };
+    img.src = URL.createObjectURL(fl);
+  });
+  const clear = el('button', 'rm', '×'); clear.type = 'button'; clear.title = 'Remove image';
+  clear.style.position = 'static';
+  clear.addEventListener('click', () => { obj.thumb = ''; file.value = ''; setPreview(); });
+  row.append(preview, file, clear);
+  f.append(row, el('div', 'sub', 'Uploaded images are stored inside the content itself; keep them small.'));
   return f;
 }
 
@@ -194,9 +237,25 @@ function renderContent() {
     card.append(textField(x, 'title', 'Title'), textField(x, 'body', 'Body', { textarea: true }));
   }, { title: '', body: '' }, 'Add principle')));
 
-  // Deep knowledge
+  // Deep knowledge + free-form knowledge base for the AI
   const dk = state.deepKnowledge || (state.deepKnowledge = { wsp: '', maf: '' });
-  p.append(group('Concierge deep knowledge', textField(dk, 'wsp', 'WSP context', { textarea: true }), textField(dk, 'maf', 'MAF context', { textarea: true })));
+  p.append(group('AI knowledge: core context', textField(dk, 'wsp', 'WSP context', { textarea: true }), textField(dk, 'maf', 'MAF context', { textarea: true })));
+  if (!state.knowledgeBase) state.knowledgeBase = [];
+  const kbList = cardList(state.knowledgeBase, (card, k) => {
+    card.append(textField(k, 'title', 'Topic / source name'), textField(k, 'body', 'Facts the AI may use (your words; it will not invent beyond this)', { textarea: true }));
+  }, { title: '', body: '' }, 'Add knowledge entry');
+  const kbGrp = group('AI knowledge base (add sources, references, corrections)', kbList);
+  kbGrp.prepend(el('p', 'hint', 'Every entry here is fed to the AI concierge. Add data sources, reference material, project detail, or things to emphasise. To omit something, delete or edit the entry and the core context above.'));
+  p.append(kbGrp);
+
+  // Media & highlights
+  if (!state.media) state.media = [];
+  p.append(group('Media & highlights (public)', cardList(state.media, (card, m) => {
+    const r = el('div', 'two');
+    r.append(selectField(m, 'kind', 'Type', ['post', 'video', 'article']), textField(m, 'tag', 'Tag (e.g. WSP, Majid Al Futtaim)'));
+    card.append(r, textField(m, 'title', 'Title'), textField(m, 'desc', 'One-line description'), textField(m, 'url', 'Link (LinkedIn post, YouTube…) — hidden on the site until set'));
+    card.append(thumbField(m));
+  }, { kind: 'post', tag: '', title: '', desc: '', url: '', thumb: '' }, 'Add media item')));
 
   // LinkedIn pulse
   const lp = state.linkedinPulse;
@@ -251,6 +310,11 @@ function renderPrivate() {
     card.append(textField(x, 'title', 'Title'), textField(x, 'body', 'Description', { textarea: true }));
   }, { title: '', body: '' }, 'Add portfolio item')));
 
+  if (!vaultState.media) vaultState.media = [];
+  p.append(group('Private media (links shown only after unlock)', cardList(vaultState.media, (card, x) => {
+    card.append(textField(x, 'title', 'Title'), textField(x, 'url', 'Link (video, deck, drive folder…) — hidden until set'), textField(x, 'note', 'Note (optional)'));
+  }, { title: '', url: '', note: '' }, 'Add private media')));
+
   // ── References: behind a SECOND, separate password ──
   p.append(el('h2', null, 'References (second password)'), el('p', 'hint', 'A separate encrypted file with its own password, shown inside the Deeper Dive. Give this second key only to people you want to reach your referees.'));
 
@@ -280,7 +344,7 @@ async function loadExistingVault() {
     const r = await fetch('./vault.enc.json'); if (!r.ok) throw 0;
     const blob = await r.json();
     const data = await decrypt(blob, key);
-    vaultState = { sections: data.sections || [], portfolio: data.portfolio || [] };
+    vaultState = { sections: data.sections || [], portfolio: data.portfolio || [], media: data.media || [] };
     vaultKey = key;
     renderPrivate();
     alert('Loaded. You can now edit and re-publish.');

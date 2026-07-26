@@ -44,6 +44,12 @@ function renderVault(data) {
       data.portfolio.map((p) => `<div class="vault-pcard"><b>${esc(p.title)}</b><span>${esc(p.body)}</span></div>`).join('') +
       `</div>`;
   }
+  const media = (data.media || []).filter((m) => m.url);
+  if (media.length) {
+    html += `<h3><span>Private media</span></h3><div class="vault-portfolio">` +
+      media.map((m) => `<a class="vault-pcard vault-media" href="${esc(m.url)}" target="_blank" rel="noopener"><b>${esc(m.title)} ↗</b><span>${esc(m.note || '')}</span></a>`).join('') +
+      `</div>`;
+  }
   box.innerHTML = html;
   box.hidden = false;
   mountReferences(box);
