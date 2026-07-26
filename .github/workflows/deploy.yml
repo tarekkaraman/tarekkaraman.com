@@ -1,8 +1,10 @@
-name: Deploy to GitHub Pages (prod)
+name: Deploy to GitHub Pages (fallback mirror)
 
+# Prod now lives on Cloudflare Pages at https://tarekkaraman.com (auto-builds
+# from `main` via Git integration, with live Claude chat + KV CMS).
+# This GitHub Pages deploy is kept as a manual-only static fallback mirror
+# (on-device chat, file-based CMS). Run it from the Actions tab when needed.
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
 
 permissions:

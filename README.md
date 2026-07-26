@@ -8,17 +8,19 @@ an encrypted confidential vault, and a hidden terminal for the engineers on the 
 
 | Env | What | Where |
 | --- | --- | --- |
-| dev | local Vite server | `npm run dev` → http://127.0.0.1:5350 (branch: `dev`) |
-| prod | GitHub Pages, auto-deploys on push to `main` | https://tarekkaraman.github.io/tarek-cv/ |
-| next | Cloudflare Pages (custom domain + live Claude chat) | see `DEPLOY.md` |
+| **prod** | Cloudflare Pages, auto-builds from `main` | **https://tarekkaraman.com** |
+| **dev** | local Vite server | `npm run dev` → http://127.0.0.1:5350 |
+| fallback | GitHub Pages (manual mirror) | https://tarekkaraman.github.io/tarek-cv/ |
+
+Cloudflare Pages is prod (live Claude chat + KV CMS). Dev is local only. See `DEPLOY.md`
+for the one-time Cloudflare connection steps.
 
 ## Daily workflow
 
 ```bash
-npm run dev          # local dev on :5350
-git checkout dev     # work on dev branch
-# … edit, verify …
-git checkout main && git merge dev && git push   # deploys prod
+npm run dev                    # local dev on :5350
+# … edit, verify in the browser …
+git add -A && git commit -m "…" && git push   # Cloudflare builds & deploys prod
 ```
 
 ## Editing content — two ways

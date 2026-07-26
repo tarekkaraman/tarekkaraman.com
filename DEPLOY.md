@@ -1,52 +1,61 @@
 # Deployment
 
-## Prod today — GitHub Pages (already wired)
+## Environments
 
-Push to `main` → `.github/workflows/deploy.yml` builds with Vite and deploys `dist/` to
-GitHub Pages. Public URL: **https://tarekkaraman.github.io/tarek-cv/**
+| Env | What | Where |
+| --- | --- | --- |
+| **prod** | Cloudflare Pages, auto-builds from `main` | **https://tarekkaraman.com** |
+| **dev** | local Vite server | `npm run dev` → http://127.0.0.1:5350 |
+| fallback | GitHub Pages (manual mirror, static) | https://tarekkaraman.github.io/tarek-cv/ |
 
-The chat runs in on-device mode here (GitHub Pages can't run server functions).
+Git is the source of truth. Push to `main` → Cloudflare Pages builds and deploys prod.
+Everything on the site uses relative paths, so the same build works at the root domain,
+on Pages preview URLs, and on the GitHub Pages subpath with no code change.
 
-## Going custom-domain + live Claude chat — Cloudflare Pages
+## One-time Cloudflare setup (dashboard — needs your login)
 
-When you buy the domain on Cloudflare:
+You've already added `tarekkaraman.com` to Cloudflare. Now connect the site:
 
-1. Cloudflare dashboard → **Workers & Pages → Create → Pages → Connect to Git** → pick the
-   `tarek-cv` repo.
-2. Build settings: framework **Vite**, build command `npm run build`, output `dist`.
-   Functions in `functions/` are picked up automatically → `/api/chat` goes live.
-3. **Settings → Environment variables**: add `ANTHROPIC_API_KEY` (console.anthropic.com).
-   Optional: `CHAT_MODEL` (defaults to `claude-sonnet-5`).
-4. **For the live CMS** (edit content from the browser, saved for all visitors):
-   - Settings → Functions → **KV namespace bindings** → add binding, variable name
-     `CONTENT`, pointing at a new KV namespace.
-   - Settings → Environment variables → add `ADMIN_KEY` (your CMS password).
-5. **Custom domains** tab → add the domain — DNS is automatic since it's on Cloudflare.
-6. Production branch = `main`. Pushes to `dev` create preview deployments with unique
-   URLs — that becomes your hosted dev env.
+1. **Workers & Pages → Create → Pages → Connect to Git** → pick the `tarek-cv` repo.
+2. **Build settings**
+   - Framework preset: **Vite** (or "None")
+   - Build command: `npm run build`
+   - Build output directory: `dist`
+   - Production branch: `main`
+   - Functions in `functions/` and the `_headers` / `_redirects` files are picked up
+     automatically.
+3. **Custom domains** tab → **Set up a custom domain** → `tarekkaraman.com`
+   (and optionally `www.tarekkaraman.com` — the `_redirects` file already sends www → apex).
+   DNS is automatic since the domain is on Cloudflare.
+4. **Settings → Environment variables (Production)**
+   - `ANTHROPIC_API_KEY` = your key from console.anthropic.com (turns on live Claude chat)
+   - `ADMIN_KEY` = your CMS password
+   - optional `CHAT_MODEL` (defaults to `claude-sonnet-5`)
+5. **Settings → Functions → KV namespace bindings** (turns on the live CMS)
+   - Create a KV namespace (e.g. `tarek-cv-content`)
+   - Add a binding: **Variable name `CONTENT`** → that namespace
+6. Redeploy (Deployments → Retry deployment) so the new bindings take effect.
 
-The frontend auto-detects the functions: same build works on both hosts, no code change.
+### Verify
+- Visit https://tarekkaraman.com — the concierge footer should read
+  “● live — powered by Claude”.
+- Open https://tarekkaraman.com/admin.html, enter your `ADMIN_KEY`, and the mode pill
+  should read “● live persistence (KV)”. Edit something → **Publish live** → refresh the
+  site to confirm.
 
-## The CMS (editing content)
+## Publishing content after go-live
 
-Open **`/admin.html`** on the site (or ⌘K → "Open the CMS").
+- **Public content**: `/admin.html` → edit → **Publish live** (writes to KV, instant).
+- **Deeper Dive + References** (encrypted): edit in the CMS, **Download vault.enc.json** /
+  **references.enc.json**, drop them into `public/`, commit & push. Cloudflare rebuilds.
+  (These are served as static encrypted files, so they update on build, not via KV.)
 
-- **On GitHub Pages** (no backend): edit → *Save draft* → *Preview* (opens the site with
-  your draft) → *Publish* tab → *Download content.json* into `public/`, commit & push.
-  Edited the Deeper Dive? *Download vault.enc.json* into `public/` too. Redeploys in ~1 min.
-- **On Cloudflare** (with KV + `ADMIN_KEY`): edit → *Publish live* writes straight to KV,
-  visible to everyone instantly. (The Deeper Dive still downloads as an encrypted file to
-  commit, since it's served statically.)
+## Checklist
 
-The editor key you type is your `ADMIN_KEY` on Cloudflare; on static hosting it just
-unlocks the editor UI locally (publishing there always goes through git, which is the real
-gate).
-
-## Checklist for Tarek
-
-- [ ] Buy domain on Cloudflare
-- [ ] Connect repo to Cloudflare Pages (steps above)
-- [ ] Paste `ANTHROPIC_API_KEY` env var
-- [ ] Verify chat shows "● live — powered by Claude"
-- [ ] Change the vault access key in `.vault-pass` + `npm run vault` + push
-- [ ] Record a 60–90s voice intro (optional next feature — hero play button)
+- [x] Domain added to Cloudflare (`tarekkaraman.com`)
+- [ ] Connect `tarek-cv` repo to Cloudflare Pages (steps above)
+- [ ] Add custom domain in the Pages project
+- [ ] Set `ANTHROPIC_API_KEY` + `ADMIN_KEY` env vars
+- [ ] Add `CONTENT` KV binding
+- [ ] Verify live chat + live CMS
+- [ ] Change the Deeper Dive / References keys from the placeholders before sharing
