@@ -10,7 +10,7 @@ an encrypted confidential vault, and a hidden terminal for the engineers on the 
 | --- | --- | --- |
 | **prod** | Cloudflare Pages, auto-builds from `main` | **https://tarekkaraman.com** |
 | **dev** | local Vite server | `npm run dev` → http://127.0.0.1:5350 |
-| fallback | GitHub Pages (manual mirror) | https://tarekkaraman.github.io/tarek-cv/ |
+| fallback | GitHub Pages (manual mirror) | https://tarekkaraman.github.io/tarekkaraman.com/ |
 
 Cloudflare Pages is prod (live Claude chat + KV CMS). Dev is local only. See `DEPLOY.md`
 for the one-time Cloudflare connection steps.

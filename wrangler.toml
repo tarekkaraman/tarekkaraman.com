@@ -8,6 +8,6 @@
 #   KV binding: variable name CONTENT → a KV namespace (live CMS content)
 # These are intentionally NOT committed here (secrets never live in the repo).
 
-name = "tarek-cv"
+name = "tarekkaraman-com"
 pages_build_output_dir = "dist"
 compatibility_date = "2024-11-01"

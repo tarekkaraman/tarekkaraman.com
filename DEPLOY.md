@@ -6,7 +6,7 @@
 | --- | --- | --- |
 | **prod** | Cloudflare Pages, auto-builds from `main` | **https://tarekkaraman.com** |
 | **dev** | local Vite server | `npm run dev` → http://127.0.0.1:5350 |
-| fallback | GitHub Pages (manual mirror, static) | https://tarekkaraman.github.io/tarek-cv/ |
+| fallback | GitHub Pages (manual mirror, static) | https://tarekkaraman.github.io/tarekkaraman.com/ |
 
 Git is the source of truth. Push to `main` → Cloudflare Pages builds and deploys prod.
 Everything on the site uses relative paths, so the same build works at the root domain,
@@ -16,7 +16,7 @@ on Pages preview URLs, and on the GitHub Pages subpath with no code change.
 
 You've already added `tarekkaraman.com` to Cloudflare. Now connect the site:
 
-1. **Workers & Pages → Create → Pages → Connect to Git** → pick the `tarek-cv` repo.
+1. **Workers & Pages → Create → Pages → Connect to Git** → pick the `tarekkaraman.com` repo.
 2. **Build settings**
    - Framework preset: **Vite** (or "None")
    - Build command: `npm run build`
@@ -32,7 +32,7 @@ You've already added `tarekkaraman.com` to Cloudflare. Now connect the site:
    - `ADMIN_KEY` = your CMS password
    - optional `CHAT_MODEL` (defaults to `claude-sonnet-5`)
 5. **Settings → Functions → KV namespace bindings** (turns on the live CMS)
-   - Create a KV namespace (e.g. `tarek-cv-content`)
+   - Create a KV namespace (e.g. `tarekkaraman-content`)
    - Add a binding: **Variable name `CONTENT`** → that namespace
 6. Redeploy (Deployments → Retry deployment) so the new bindings take effect.
 
@@ -53,7 +53,7 @@ You've already added `tarekkaraman.com` to Cloudflare. Now connect the site:
 ## Checklist
 
 - [x] Domain added to Cloudflare (`tarekkaraman.com`)
-- [ ] Connect `tarek-cv` repo to Cloudflare Pages (steps above)
+- [ ] Connect `tarekkaraman.com` repo to Cloudflare Pages (steps above)
 - [ ] Add custom domain in the Pages project
 - [ ] Set `ANTHROPIC_API_KEY` + `ADMIN_KEY` env vars
 - [ ] Add `CONTENT` KV binding
