@@ -2,6 +2,9 @@ import { loadContent } from './data/content.js';
 import { initChat, openChat, setCorpus } from './chat.js';
 import { initVault, setVaultFraming } from './vault.js';
 import { initTerminal, openTerminal, setTerminalData } from './terminal.js';
+import { initParticles } from './particles.js';
+
+initParticles();
 
 const $ = (s) => document.querySelector(s);
 const el = (tag, cls, html) => {
@@ -97,14 +100,14 @@ function render(profile) {
   profile.skills.forEach((s) => skills.append(el('span', null, esc(s))));
 
   /* LinkedIn pulse */
-  /* Media & highlights */
-  const mediaItems = (profile.media || []).filter((m) => m.url);
+  /* Media & highlights: items appear once they have a link or a thumbnail */
+  const mediaItems = (profile.media || []).filter((m) => m.url || m.thumb);
   if (mediaItems.length) {
     $('#media').hidden = false;
     const grid = $('#media-grid');
     mediaItems.forEach((m) => {
-      const card = el('a', 'media-card reveal');
-      card.href = m.url; card.target = '_blank'; card.rel = 'noopener';
+      const card = el(m.url ? 'a' : 'div', 'media-card reveal' + (m.url ? '' : ' media-nolink'));
+      if (m.url) { card.href = m.url; card.target = '_blank'; card.rel = 'noopener'; }
       const thumb = m.thumb
         ? `<div class="media-thumb" style="background-image:url('${m.thumb.replace(/'/g, '%27')}')"></div>`
         : `<div class="media-thumb media-thumb-ph"><span>${m.kind === 'video' ? '▶' : '✦'}</span></div>`;
@@ -175,7 +178,12 @@ function render(profile) {
   /* Education & interests */
   const eduGrid = $('#edu-grid');
   profile.education.forEach((e) => eduGrid.append(el('div', 'edu', `<b>${esc(e.title)}</b><span>${esc(e.place)}</span>`)));
-  eduGrid.append(el('div', 'edu', `<b>Interests</b><span>${esc(profile.interests.join(' · '))}</span>`));
+  profile.interests.forEach((i) => {
+    const [head, ...rest] = String(i).split(':');
+    const body = rest.join(':').trim();
+    eduGrid.append(el('div', 'edu edu-interest',
+      `<b>${esc(body ? head : 'Interest')}</b><span>${esc(body || head)}</span>`));
+  });
 
   /* Contact */
   const contactCards = $('#contact-cards');

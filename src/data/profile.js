@@ -6,6 +6,23 @@
 // Private material lives encrypted (see private/*-content.json).
 // ─────────────────────────────────────────────────────────────
 
+// Branded SVG tiles used as media thumbnails until real screenshots are
+// uploaded via the CMS (any uploaded image simply replaces these).
+const tile = (svgBody, bg = '#101725') =>
+  'data:image/svg+xml;utf8,' + encodeURIComponent(
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 400"><rect width="640" height="400" fill="${bg}"/>${svgBody}</svg>`
+  );
+const msSquares = (x, y, s) =>
+  `<rect x="${x}" y="${y}" width="${s}" height="${s}" fill="#f25022"/><rect x="${x + s + 6}" y="${y}" width="${s}" height="${s}" fill="#7fba00"/><rect x="${x}" y="${y + s + 6}" width="${s}" height="${s}" fill="#00a4ef"/><rect x="${x + s + 6}" y="${y + s + 6}" width="${s}" height="${s}" fill="#ffb900"/>`;
+const THUMBS = {
+  msCeo: tile(`${msSquares(60, 60, 34)}<circle cx="320" cy="205" r="58" fill="none" stroke="#e7c15e" stroke-width="4"/><path d="M300 175 L360 205 L300 235 Z" fill="#e7c15e"/><text x="320" y="330" text-anchor="middle" font-family="Georgia" font-size="34" fill="#f2ecdd">Microsoft on MAF</text>`),
+  mafGpt: tile(`<rect x="170" y="90" width="300" height="150" rx="24" fill="#1d2b4f"/><rect x="170" y="90" width="300" height="150" rx="24" fill="none" stroke="#e7c15e" stroke-width="3"/><text x="320" y="180" text-anchor="middle" font-family="Georgia" font-size="52" fill="#e7c15e">MAF GPT</text><path d="M250 240 L280 240 L255 285 Z" fill="#1d2b4f" stroke="#e7c15e" stroke-width="3"/><text x="320" y="340" text-anchor="middle" font-family="Georgia" font-size="26" fill="#f2ecdd">One of the region's first enterprise GenAI assistants</text>`),
+  teamYear: tile(`<path d="M320 90 L338 150 L400 150 L350 188 L368 250 L320 212 L272 250 L290 188 L240 150 L302 150 Z" fill="#e7c15e"/><text x="320" y="310" text-anchor="middle" font-family="Georgia" font-size="38" fill="#f2ecdd">Team of the Year</text><text x="320" y="348" text-anchor="middle" font-family="Georgia" font-size="24" fill="#b0a894">AI-Driven Transformation</text>`, '#141017'),
+  mafMs: tile(`${msSquares(180, 130, 44)}<text x="320" y="185" text-anchor="middle" font-family="Georgia" font-size="54" fill="#f2ecdd">×</text><text x="440" y="200" text-anchor="middle" font-family="Georgia" font-size="46" fill="#e7c15e">MAF</text><text x="320" y="310" text-anchor="middle" font-family="Georgia" font-size="30" fill="#f2ecdd">Strategic partnership</text>`),
+  wspHiring: tile(`<text x="320" y="190" text-anchor="middle" font-family="Helvetica,Arial" font-weight="bold" font-size="110" fill="#ff372f">WSP</text><text x="320" y="280" text-anchor="middle" font-family="Georgia" font-size="32" fill="#f2ecdd">Growing the Middle East AI team</text>`, '#181a1f'),
+  wspGeo: tile(`<circle cx="320" cy="170" r="70" fill="none" stroke="#e7c15e" stroke-width="3"/><circle cx="320" cy="170" r="46" fill="none" stroke="#e7c15e" stroke-width="2" opacity=".6"/><circle cx="320" cy="170" r="22" fill="#e7c15e" opacity=".85"/><text x="320" y="300" text-anchor="middle" font-family="Helvetica,Arial" font-weight="bold" font-size="52" fill="#ff372f">WSP</text><text x="320" y="345" text-anchor="middle" font-family="Georgia" font-size="26" fill="#f2ecdd">AI × geotechnical engineering</text>`, '#181a1f')
+};
+
 export const profile = {
   name: 'Tarek Karaman',
   headline: 'AI & Digital Transformation Leader',
@@ -27,9 +44,9 @@ export const profile = {
 
   stats: [
     { value: 25, suffix: '+', label: 'Years experience' },
+    { value: 60000, suffix: '+', label: 'People enabled with AI, across WSP & MAF' },
     { value: 8, suffix: '+', label: 'Enterprise AI tools shipped' },
-    { value: 20, prefix: '$', suffix: 'M+', label: 'Programs delivered' },
-    { value: 2, suffix: '', label: 'Centres of Excellence founded' }
+    { value: 20, prefix: '$', suffix: 'M+', label: 'Programs delivered' }
   ],
 
   experience: [
@@ -160,12 +177,12 @@ export const profile = {
   // Add a thumbnail in the CMS (uploaded images are stored inline) or leave
   // empty for a branded placeholder tile.
   media: [
-    { title: 'Microsoft CEO on the MAF partnership', kind: 'video', tag: 'Majid Al Futtaim', desc: 'Microsoft leadership speaking about the MAF AI transformation.', url: '', thumb: '' },
-    { title: 'MAF GPT launch', kind: 'post', tag: 'Majid Al Futtaim', desc: 'Launching one of the region’s first secure enterprise GenAI assistants.', url: '', thumb: '' },
-    { title: 'Team of the Year, AI-Driven Transformation', kind: 'post', tag: 'Majid Al Futtaim', desc: 'The award post recognising the team’s AI-driven transformation.', url: '', thumb: '' },
-    { title: 'MAF × Microsoft partnership', kind: 'post', tag: 'Majid Al Futtaim', desc: 'The strategic partnership announcement.', url: '', thumb: '' },
-    { title: 'Hiring the WSP AI team', kind: 'post', tag: 'WSP', desc: 'Growing the Middle East AI engineering and business-partner team.', url: 'https://www.linkedin.com/feed/update/urn:li:activity:7463535335600226304/', thumb: '' },
-    { title: 'AI in geotechnical engineering', kind: 'post', tag: 'WSP', desc: 'WSP at the MENA Geospatial Forum: better decisions, not just more data.', url: 'https://www.linkedin.com/feed/update/urn:li:activity:7481413797270786048/', thumb: '' }
+    { title: 'MAF × Microsoft partnership', kind: 'post', tag: 'Majid Al Futtaim', desc: 'The strategic partnership announcement on LinkedIn.', url: '', thumb: THUMBS.mafMs },
+    { title: 'MAF GPT launch', kind: 'post', tag: 'Majid Al Futtaim', desc: 'Launching one of the region’s first secure enterprise GenAI assistants.', url: '', thumb: THUMBS.mafGpt },
+    { title: 'Team of the Year, AI-Driven Transformation', kind: 'post', tag: 'Majid Al Futtaim', desc: 'The award recognising the team’s AI-driven transformation.', url: '', thumb: THUMBS.teamYear },
+    { title: 'Microsoft CEO on the MAF partnership', kind: 'video', tag: 'Majid Al Futtaim', desc: 'Microsoft leadership speaking about the MAF AI transformation.', url: '', thumb: THUMBS.msCeo },
+    { title: 'Hiring the WSP AI team', kind: 'post', tag: 'WSP', desc: 'Growing the Middle East AI engineering and business-partner team.', url: 'https://www.linkedin.com/feed/update/urn:li:activity:7463535335600226304/', thumb: THUMBS.wspHiring },
+    { title: 'AI in geotechnical engineering', kind: 'post', tag: 'WSP', desc: 'WSP at the MENA Geospatial Forum: better decisions, not just more data.', url: 'https://www.linkedin.com/feed/update/urn:li:activity:7481413797270786048/', thumb: THUMBS.wspGeo }
   ],
 
   linkedinPulse: {
@@ -190,13 +207,15 @@ export const profile = {
 
   education: [
     { title: 'BA (Hons)', place: 'Middlesex University, London' },
-    { title: 'Audio Media Engineering Diploma', place: 'SAE Institute, London' }
+    { title: 'Audio Media Engineering Diploma', place: 'SAE Institute, London. The engineering roots that later became a 6,000-track digital music platform.' },
+    { title: 'A-Levels', place: 'Sociology, Business Studies, IT & General Studies' },
+    { title: 'Executive learning', place: 'Continuous development alongside Microsoft, IBM and Gartner, including directing a regional GenAI Symposium.' }
   ],
 
   interests: [
-    'Generative AI & emerging technology',
-    'Enterprise innovation & R&D',
-    'Mentoring & capability building'
+    'Generative AI & emerging technology: a hands-on builder, not just a sponsor. This site, designed and engineered with AI under his direction, is one of his experiments.',
+    'Enterprise innovation & R&D: from founding a music-tech platform in 2006 to standing up AI accelerators today, the pattern is building what does not exist yet.',
+    'Mentoring & capability building: founded the AI Academy at WSP and has trained hundreds of professionals; believes teams that outlast you are the real legacy.'
   ],
 
   // Framing for the key-gated area.
