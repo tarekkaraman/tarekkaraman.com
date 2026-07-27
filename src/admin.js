@@ -71,6 +71,7 @@ async function boot() {
   const rd = JSON.parse(localStorage.getItem('tk-refs-draft') || 'null');
   if (rd) refsState = rd;
   renderContent();
+  renderSeo();
   renderPrivate();
   renderPublish();
 }
@@ -286,6 +287,37 @@ function renderContent() {
   p.append(group('Interests', listField(state, 'interests', 'Interests')));
 }
 
+/* ── SEO tab ── */
+function renderSeo() {
+  const p = $('#tab-seo');
+  p.innerHTML = '';
+  p.append(el('h2', null, 'SEO & discoverability'),
+    el('p', 'hint', 'What search engines and link previews (LinkedIn, WhatsApp, Twitter/X) see. Publishing bakes these straight into the page\'s <head> tags, not just the visible content, so they work for crawlers and preview bots that don\'t run the page\'s JavaScript.'));
+
+  if (!state.seo) state.seo = clone(DEFAULT_CONTENT.seo);
+  const seo = state.seo;
+
+  const basics = el('div');
+  basics.append(
+    textField(seo, 'title', 'Page title', { sub: 'Shown in the browser tab, Google\'s result title, and link previews. Keep it under ~60 characters.' }),
+    textField(seo, 'description', 'Meta description', { textarea: true, sub: 'The snippet under your title in Google results and most link previews. Aim for 140–160 characters.' }),
+    textField(seo, 'ogImageAlt', 'Share-image alt text', { sub: 'Describes the preview image (public/og-card.jpg) for screen readers and accessibility-aware crawlers.' })
+  );
+  p.append(group('Titles & descriptions', basics));
+
+  p.append(group('Topics (what you want to be found for)',
+    listField(seo, 'topics', 'Topics / keywords', 'One per line. Feeds the page\'s structured data (JSON-LD "knowsAbout") that search engines use to associate you with these subjects, e.g. "Chief AI Officer", "Microsoft Copilot enterprise rollout", "AI strategy Middle East".')));
+
+  const verify = el('div');
+  verify.append(
+    textField(seo, 'googleVerification', 'Google Search Console verification code', { sub: 'From search.google.com/search-console → Add property → HTML tag method. Paste just the content="…" value. Leave blank to skip.' }),
+    textField(seo, 'bingVerification', 'Bing Webmaster Tools verification code', { sub: 'From bing.com/webmasters → same idea, paste just the code value. Leave blank to skip.' })
+  );
+  const verifyGrp = group('Search engine verification', verify);
+  verifyGrp.append(el('p', 'hint', 'Optional, but worth doing once: verifying ownership in both consoles lets you see search traffic, submit the sitemap directly, and get alerted to indexing problems. Takes about 5 minutes each, no code required beyond pasting the value here and publishing.'));
+  p.append(verifyGrp);
+}
+
 /* ── Private (Deeper Dive) tab ── */
 function renderPrivate() {
   const p = $('#tab-private');
@@ -375,7 +407,7 @@ function renderPublish() {
     ? 'Live mode: “Publish live” writes content to Cloudflare KV, visible to everyone immediately. The Deeper Dive is published as a file you commit.'
     : 'Not connected yet: use the download buttons and hand the files to whoever manages the repo, or ask Claude to finish the one-time setup in DEPLOY.md.';
   $('#pub-help').innerHTML = mode.github
-    ? `<b>What "Publish live" does:</b> it commits <code>content.json</code> (and, if you've entered the Deeper Dive or References key on this tab, the freshly encrypted <code>vault.enc.json</code> / <code>references.enc.json</code> too) straight to the site's repository. That automatically triggers a rebuild, same as if you'd pushed the change yourself, you just never see it happen.`
+    ? `<b>What "Publish live" does:</b> it commits <code>content.json</code>, the SEO tab's fields freshly baked into <code>index.html</code>'s meta tags, and (if you've entered the Deeper Dive or References key on this tab) the freshly encrypted <code>vault.enc.json</code> / <code>references.enc.json</code>, straight to the site's repository. That automatically triggers a rebuild, same as if you'd pushed the change yourself, you just never see it happen.`
     : mode.kv
     ? `<b>Deeper Dive on Cloudflare:</b> download <code>vault.enc.json</code> and commit it (the encrypted file is served statically). Content itself persists live in KV.`
     : `<b>To publish without a live connection:</b><ol>
@@ -398,6 +430,73 @@ $('#preview-btn').addEventListener('click', () => {
 });
 
 /* ── Publish live / downloads ── */
+// Regenerates the SEO:START…SEO:END block in index.html from state.seo and
+// splices it into the current file text. Keeps the actual meta/JSON-LD tags
+// static in the shipped HTML (so crawlers and link-preview bots that don't
+// run JS still see them) while letting the CMS be the source of truth.
+function buildSeoBlock(seo) {
+  const esc = (s) => String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
+  const title = esc(seo.title);
+  const desc = esc(seo.description);
+  const topics = (seo.topics || []).filter(Boolean);
+  const verify = [];
+  if (seo.googleVerification) verify.push(`  <meta name="google-site-verification" content="${esc(seo.googleVerification)}" />`);
+  if (seo.bingVerification) verify.push(`  <meta name="msvalidate.01" content="${esc(seo.bingVerification)}" />`);
+
+  const jsonLd = {
+    '@context': 'https://schema.org', '@type': 'Person', name: 'Tarek Karaman',
+    jobTitle: 'Head of Artificial Intelligence, WSP Middle East',
+    description: seo.description,
+    url: 'https://tarekkaraman.com/', image: 'https://tarekkaraman.com/og-card.jpg',
+    email: 'mailto:tarekkaraman@me.com',
+    worksFor: { '@type': 'Organization', name: 'WSP' },
+    alumniOf: [
+      { '@type': 'CollegeOrUniversity', name: 'Middlesex University, London' },
+      { '@type': 'CollegeOrUniversity', name: 'SAE Institute, London' }
+    ],
+    award: [
+      'Team of the Year, AI-Driven Transformation, Majid Al Futtaim',
+      'Executive Recognition, Microsoft & MAF Group leadership'
+    ],
+    address: { '@type': 'PostalAddress', addressLocality: 'Dubai', addressCountry: 'AE' },
+    knowsAbout: topics,
+    sameAs: ['https://www.linkedin.com/in/tarekkaraman']
+  };
+
+  return [
+    '<!-- SEO:START — regenerated on CMS Publish from profile.seo. Don\'t hand-edit',
+    '     between these markers; edit in /admin → SEO instead, or the next',
+    '     publish will overwrite it. Markers must stay exactly as-is. -->',
+    `  <title>${title}</title>`,
+    `  <meta name="description" content="${desc}" />`,
+    '  <meta name="robots" content="index, follow" />',
+    `  <meta property="og:title" content="${title}" />`,
+    `  <meta property="og:description" content="${desc}" />`,
+    '  <meta property="og:type" content="profile" />',
+    '  <meta property="og:url" content="https://tarekkaraman.com/" />',
+    '  <meta property="og:site_name" content="Tarek Karaman" />',
+    '  <meta property="og:image" content="https://tarekkaraman.com/og-card.jpg" />',
+    '  <meta property="og:image:width" content="1200" />',
+    '  <meta property="og:image:height" content="630" />',
+    `  <meta property="og:image:alt" content="${esc(seo.ogImageAlt)}" />`,
+    '  <meta name="twitter:card" content="summary_large_image" />',
+    `  <meta name="twitter:title" content="${title}" />`,
+    `  <meta name="twitter:description" content="${desc}" />`,
+    '  <meta name="twitter:image" content="https://tarekkaraman.com/og-card.jpg" />',
+    ...verify,
+    '  <script type="application/ld+json">',
+    JSON.stringify(jsonLd, null, 2),
+    '  </script>',
+    '  <!-- SEO:END -->'
+  ].join('\n');
+}
+
+function spliceSeoBlock(html, seo) {
+  const re = /<!-- SEO:START[\s\S]*?<!-- SEO:END -->/;
+  if (!re.test(html)) throw new Error('SEO markers not found in index.html, publish skipped for safety');
+  return html.replace(re, buildSeoBlock(seo));
+}
+
 $('#publish-live').addEventListener('click', async () => {
   const msg = $('#publish-msg');
   if (!mode.live) { msg.className = 'pub-msg err'; msg.textContent = 'Live persistence not configured, use the download buttons instead.'; return; }
@@ -408,6 +507,10 @@ $('#publish-live').addEventListener('click', async () => {
       const files = [{ path: 'public/content.json', content: JSON.stringify(state, null, 2) }];
       if (vaultKey) files.push({ path: 'public/vault.enc.json', content: JSON.stringify(await encrypt(vaultState, vaultKey), null, 2) });
       if (refsKey) files.push({ path: 'public/references.enc.json', content: JSON.stringify(await encrypt(refsState, refsKey), null, 2) });
+      try {
+        const currentHtml = await fetch('./index.html', { cache: 'no-store' }).then((r) => r.ok ? r.text() : null);
+        if (currentHtml) files.push({ path: 'index.html', content: spliceSeoBlock(currentHtml, state.seo || DEFAULT_CONTENT.seo) });
+      } catch { /* SEO tags just won't update this publish; content still does */ }
       const r = await fetch('./api/publish', {
         method: 'POST', headers: { 'content-type': 'application/json', 'x-admin-key': adminKey },
         body: JSON.stringify({ files, message: 'CMS publish' })
@@ -483,7 +586,7 @@ function flash(btn, text) { const t = btn.textContent; btn.textContent = text; s
 document.querySelectorAll('.tab').forEach((t) => t.addEventListener('click', () => {
   document.querySelectorAll('.tab').forEach((x) => x.classList.remove('on'));
   t.classList.add('on');
-  ['content', 'private', 'publish'].forEach((name) => { $(`#tab-${name}`).hidden = name !== t.dataset.tab; });
+  ['content', 'seo', 'private', 'publish'].forEach((name) => { $(`#tab-${name}`).hidden = name !== t.dataset.tab; });
   if (t.dataset.tab === 'publish') renderPublish();
 }));
 

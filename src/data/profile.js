@@ -20,6 +20,28 @@ export const profile = {
   name: 'Tarek Karaman',
   headline: 'AI & Digital Transformation Leader',
   role: 'Head of Artificial Intelligence, WSP Middle East',
+
+  // ── SEO / discoverability ──────────────────────────────────
+  // Editable from the CMS's "SEO" tab. On Publish, these values are baked
+  // into index.html's actual <head> tags (title, description, Open Graph,
+  // Twitter Card, Person JSON-LD) so search engines and link-preview bots
+  // see them in the raw HTML, not just after JS runs. `topics` doubles as
+  // the JSON-LD `knowsAbout` list, the terms this site should be found for.
+  seo: {
+    title: 'Tarek Karaman · AI & Digital Transformation Leader',
+    description: 'Tarek Karaman, AI & Digital Transformation Leader. 25+ years delivering enterprise-scale innovation. Head of AI, WSP Middle East. Ask my AI anything.',
+    ogImageAlt: 'Tarek Karaman, Head of Artificial Intelligence, WSP Middle East',
+    topics: [
+      'Enterprise AI', 'Generative AI', 'AI governance', 'Digital transformation',
+      'AI adoption at scale', 'Microsoft Copilot', 'AI Centres of Excellence',
+      'Chief AI Officer', 'AI strategy Middle East', 'WSP', 'Majid Al Futtaim'
+    ],
+    // Optional: paste the verification snippet's content="…" value from
+    // Google Search Console / Bing Webmaster Tools once you've registered
+    // the domain there. Leave blank to omit the tag entirely.
+    googleVerification: '',
+    bingVerification: ''
+  },
   // Internal positioning used to brief the concierge. NOT rendered as an
   // "open to work" banner (Tarek is currently employed).
   positioning: 'A technology leader operating at CTO and Chief AI Officer altitude, who builds enterprise AI capability from strategy through delivery and adoption.',

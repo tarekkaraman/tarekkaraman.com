@@ -49,12 +49,37 @@ After adding all three: **Deployments → Retry deployment** so they take effect
 
 Once the three secrets are set, everything is a single click in `/admin`:
 - **Public content** (scorecard, journey, pulse, media, etc.): edit → **Publish live**.
+- **SEO** (page title, meta description, share-image alt text, topics/keywords, search
+  console verification): edit in the **SEO** tab → **Publish live** — it bakes those values
+  straight into `index.html`'s actual `<title>`, meta, Open Graph, Twitter Card and
+  Person JSON-LD tags, so search engines and link-preview bots see them without running
+  any JavaScript.
 - **Deeper Dive / References** (encrypted): enter the relevant key in that tab, edit, then
   **Publish live** — it re-encrypts and commits the file for you automatically.
 
 No downloads, no git, no GitHub. The download buttons stay available as a manual
 fallback (e.g. if a secret is temporarily missing), but they aren't the normal path once
 the secrets above are set.
+
+## SEO setup (worth doing once you're live)
+
+1. **Google Search Console** (search.google.com/search-console) → Add property →
+   `tarekkaraman.com` → verify via the **HTML tag** method → copy just the `content="…"`
+   value → paste into `/admin` → SEO → *Google Search Console verification code* →
+   Publish live. Once verified, submit `https://tarekkaraman.com/sitemap.xml` under
+   Sitemaps so Google knows the page exists.
+2. **Bing Webmaster Tools** (bing.com/webmasters) → same idea → paste the code into
+   *Bing Webmaster Tools verification code* → Publish live → submit the same sitemap URL.
+   Bing also powers ChatGPT's and Copilot's web search, so this one matters more than it
+   used to.
+3. **Topics tab**: the "Topics / keywords" list feeds the page's structured data
+   (`knowsAbout`), which is what tells search engines and AI answer-engines which
+   subjects to associate Tarek with — e.g. "Chief AI Officer", "Microsoft Copilot
+   enterprise rollout", "AI strategy Middle East". Add or refine these any time; no
+   redeploy steps beyond the normal Publish live.
+4. Everything else (Open Graph share card, Twitter Card, canonical URL, robots.txt,
+   sitemap.xml, Person schema with education/awards/employer) is already wired up and
+   requires no ongoing maintenance beyond keeping the SEO tab's title/description current.
 
 ## Legacy option: KV instead of GitHub commits
 
