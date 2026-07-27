@@ -6,3 +6,6 @@
     <priority>1.0</priority>
   </url>
 </urlset>
+<!-- Single-page site: everything lives at the root URL, sections are
+     anchors (#journey, #media, …) rather than separate pages, so one <url>
+     entry is correct here, not an oversight. -->

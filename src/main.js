@@ -115,11 +115,14 @@ function render(profile) {
       const linked = !!m.url && !inline;
       const card = el(linked ? 'a' : 'div', 'media-card reveal' + (linked ? '' : ' media-nolink'));
       if (linked) { card.href = m.url; card.target = '_blank'; card.rel = 'noopener'; }
+      // Real <img> with descriptive alt text, not a CSS background-image, so
+      // the photo is indexable by image search and readable by screen readers.
+      const thumbAlt = `${m.title}${m.tag ? `, ${m.tag}` : ''}`;
       const thumb = inline
         ? `<video class="media-video" controls preload="metadata" playsinline` +
           (m.thumb ? ` poster="${escAttr(m.thumb)}"` : '') + ` src="${escAttr(m.video)}"></video>`
         : m.thumb
-          ? `<div class="media-thumb" style="background-image:url('${m.thumb.replace(/'/g, '%27')}')"></div>`
+          ? `<img class="media-thumb" src="${escAttr(m.thumb)}" alt="${escAttr(thumbAlt)}" loading="lazy" width="640" height="400" />`
           : `<div class="media-thumb media-thumb-ph"><span>${m.kind === 'video' ? '▶' : '✦'}</span></div>`;
       const title = inline && m.url
         ? `<a class="media-titlelink" href="${escAttr(m.url)}" target="_blank" rel="noopener">${esc(m.title)}</a>`
