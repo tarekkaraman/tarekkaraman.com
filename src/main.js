@@ -14,6 +14,8 @@ const el = (tag, cls, html) => {
   return n;
 };
 const esc = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;');
+// Attribute-safe variant: CMS-editable fields end up in src/href/poster.
+const escAttr = (s) => esc(s).replace(/"/g, '&quot;');
 
 /* ── Theme ── */
 const themeBtn = $('#theme-btn');
@@ -106,14 +108,25 @@ function render(profile) {
     $('#media').hidden = false;
     const grid = $('#media-grid');
     mediaItems.forEach((m) => {
-      const card = el(m.url ? 'a' : 'div', 'media-card reveal' + (m.url ? '' : ' media-nolink'));
-      if (m.url) { card.href = m.url; card.target = '_blank'; card.rel = 'noopener'; }
-      const thumb = m.thumb
-        ? `<div class="media-thumb" style="background-image:url('${m.thumb.replace(/'/g, '%27')}')"></div>`
-        : `<div class="media-thumb media-thumb-ph"><span>${m.kind === 'video' ? '▶' : '✦'}</span></div>`;
+      // A self-hosted clip plays in place, so the card itself must not be a
+      // link (the anchor would swallow the player controls). The title carries
+      // the link out to the original post instead.
+      const inline = !!m.video;
+      const linked = !!m.url && !inline;
+      const card = el(linked ? 'a' : 'div', 'media-card reveal' + (linked ? '' : ' media-nolink'));
+      if (linked) { card.href = m.url; card.target = '_blank'; card.rel = 'noopener'; }
+      const thumb = inline
+        ? `<video class="media-video" controls preload="metadata" playsinline` +
+          (m.thumb ? ` poster="${escAttr(m.thumb)}"` : '') + ` src="${escAttr(m.video)}"></video>`
+        : m.thumb
+          ? `<div class="media-thumb" style="background-image:url('${m.thumb.replace(/'/g, '%27')}')"></div>`
+          : `<div class="media-thumb media-thumb-ph"><span>${m.kind === 'video' ? '▶' : '✦'}</span></div>`;
+      const title = inline && m.url
+        ? `<a class="media-titlelink" href="${escAttr(m.url)}" target="_blank" rel="noopener">${esc(m.title)}</a>`
+        : esc(m.title);
       card.innerHTML = thumb +
         `<div class="media-body"><span class="media-tag">${esc(m.tag || '')}${m.kind === 'video' ? ' · video' : ''}</span>` +
-        `<b>${esc(m.title)}</b><span class="media-desc">${esc(m.desc || '')}</span></div>`;
+        `<b>${title}</b><span class="media-desc">${esc(m.desc || '')}</span></div>`;
       grid.append(card);
     });
   }

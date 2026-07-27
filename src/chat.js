@@ -22,7 +22,7 @@ const starterChips = [
 const topics = () => [
   {
     keys: ['scale', 'scope', 'size', 'budget', 'p&l', 'pnl', 'how big', 'numbers', 'users', 'impact', 'results'],
-    answer: `Scale is the through-line of Tarek's career:\n\n• Rolled out Microsoft Copilot across WSP's Middle East region\n• 8+ enterprise AI tools shipped within six months of standing up the AI Accelerator\n• Client AI programs grown from pilots to multi-year engagements valued at $20M+\n• A dedicated AI engineering delivery centre built and scaled from zero\n• Earlier: 15X revenue growth in year one at Solve IT, and a 100+ person technical team at his own venture`,
+    answer: `Scale is the through-line of Tarek's career:\n\n• Rolled out Microsoft Copilot across WSP's Middle East region\n• 25+ enterprise AI tools shipped across Majid Al Futtaim and WSP, including 8+ at WSP within six months of standing up the AI Accelerator\n• Client AI programs grown from pilots to multi-year engagements valued at $20M+\n• A dedicated AI engineering delivery centre built and scaled from zero\n• Earlier: 15X revenue growth in year one at Solve IT, and a 100+ person technical team at his own venture`,
     src: '#scorecard'
   },
   {
@@ -37,7 +37,7 @@ const topics = () => [
   },
   {
     keys: ['tools', 'shipped', 'built', 'products', 'enterprise ai tools', 'bid', 'automation', 'what has he made'],
-    answer: `Within six months of standing up WSP's AI Accelerator, Tarek's team shipped 8+ enterprise AI tools: bid automation, resourcing, data insights and project planning, improving bid-win rates and cutting delivery effort. On the client side: AI-powered water management, city digital twins and environmental simulation platforms, grown from pilots into multi-year programs valued at $20M+. At MAF he launched MAF GPT, a secure internal generative-AI assistant, plus a region-leading Microsoft Copilot deployment.`,
+    answer: `Across Majid Al Futtaim and WSP, Tarek has shipped 25+ enterprise AI tools. Within six months of standing up WSP's AI Accelerator his team shipped 8+ of them: bid automation, resourcing, data insights and project planning, improving bid-win rates and cutting delivery effort. On the client side: AI-powered water management, city digital twins and environmental simulation platforms, grown from pilots into multi-year programs valued at $20M+. At MAF he launched MAF GPT, a secure internal generative-AI assistant, plus a region-leading Microsoft Copilot deployment.`,
     src: '#journey'
   },
   {
