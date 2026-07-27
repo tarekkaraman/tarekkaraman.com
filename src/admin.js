@@ -10,7 +10,7 @@ const clone = (o) => JSON.parse(JSON.stringify(o));
 const el = (t, c, h) => { const n = document.createElement(t); if (c) n.className = c; if (h !== undefined) n.innerHTML = h; return n; };
 
 let adminKey = '';
-let mode = { kv: false, hasKey: false, live: false };
+let mode = { kv: false, github: false, hasKey: false, live: false };
 let state = clone(DEFAULT_CONTENT);
 let vaultState = { sections: [{ title: '', body: '', bullets: [] }], portfolio: [] };
 let vaultKey = '';
@@ -21,11 +21,13 @@ let refsKey = '';
 async function detectMode() {
   try {
     const r = await fetch('./api/content', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({}) });
-    if (r.ok) { const d = await r.json(); mode.kv = !!d.kv; mode.hasKey = !!d.hasKey; }
+    if (r.ok) { const d = await r.json(); mode.kv = !!d.kv; mode.github = !!d.github; mode.hasKey = !!d.hasKey; }
   } catch {}
-  mode.live = mode.kv && mode.hasKey;
+  mode.live = (mode.github || mode.kv) && mode.hasKey;
   const pill = $('#mode-pill');
-  pill.textContent = mode.live ? '● live persistence (KV)' : '○ file / local mode';
+  pill.textContent = mode.live
+    ? (mode.github ? '● live, Publish commits straight to the site' : '● live persistence (KV)')
+    : '○ file / local mode';
   pill.classList.toggle('live', mode.live);
 }
 
@@ -366,12 +368,16 @@ async function loadExistingRefs() {
 
 /* ── Publish tab ── */
 function renderPublish() {
-  $('#publish-status').textContent = mode.live
+  $('#publish-status').textContent = mode.github
+    ? 'Publish live commits your changes directly to the site. No downloads, no GitHub. It takes about a minute to go live while the site rebuilds.'
+    : mode.kv
     ? 'Live mode: “Publish live” writes content to Cloudflare KV, visible to everyone immediately. The Deeper Dive is published as a file you commit.'
-    : 'File mode: download content.json and vault.enc.json, commit them to the repo, and push. GitHub Pages redeploys automatically.';
-  $('#pub-help').innerHTML = mode.live
+    : 'Not connected yet: use the download buttons and hand the files to whoever manages the repo, or ask Claude to finish the one-time setup in DEPLOY.md.';
+  $('#pub-help').innerHTML = mode.github
+    ? `<b>What "Publish live" does:</b> it commits <code>content.json</code> (and, if you've entered the Deeper Dive or References key on this tab, the freshly encrypted <code>vault.enc.json</code> / <code>references.enc.json</code> too) straight to the site's repository. That automatically triggers a rebuild, same as if you'd pushed the change yourself, you just never see it happen.`
+    : mode.kv
     ? `<b>Deeper Dive on Cloudflare:</b> download <code>vault.enc.json</code> and commit it (the encrypted file is served statically). Content itself persists live in KV.`
-    : `<b>To publish on GitHub Pages:</b><ol>
+    : `<b>To publish without a live connection:</b><ol>
         <li>Click <b>Download content.json</b> → save into the repo's <code>public/</code> folder.</li>
         <li>If you edited the Deeper Dive, click <b>Download vault.enc.json</b> → also into <code>public/</code>.</li>
         <li>If you edited references, click <b>Download references.enc.json</b> → also into <code>public/</code>.</li>
@@ -395,6 +401,25 @@ $('#publish-live').addEventListener('click', async () => {
   const msg = $('#publish-msg');
   if (!mode.live) { msg.className = 'pub-msg err'; msg.textContent = 'Live persistence not configured, use the download buttons instead.'; return; }
   msg.className = 'pub-msg'; msg.textContent = 'publishing…';
+
+  if (mode.github) {
+    try {
+      const files = [{ path: 'public/content.json', content: JSON.stringify(state, null, 2) }];
+      if (vaultKey) files.push({ path: 'public/vault.enc.json', content: JSON.stringify(await encrypt(vaultState, vaultKey), null, 2) });
+      if (refsKey) files.push({ path: 'public/references.enc.json', content: JSON.stringify(await encrypt(refsState, refsKey), null, 2) });
+      const r = await fetch('./api/publish', {
+        method: 'POST', headers: { 'content-type': 'application/json', 'x-admin-key': adminKey },
+        body: JSON.stringify({ files, message: 'CMS publish' })
+      });
+      const d = await r.json();
+      if (!r.ok || !d.ok) throw new Error(d.results?.find((x) => !x.ok)?.error || d.error || r.status);
+      msg.className = 'pub-msg ok';
+      msg.textContent = `✓ committed ${files.length} file${files.length > 1 ? 's' : ''}, live in about a minute while the site rebuilds`;
+    } catch (e) { msg.className = 'pub-msg err'; msg.textContent = `✕ ${e.message}`; }
+    return;
+  }
+
+  // Legacy KV path
   try {
     const r = await fetch('./api/content', { method: 'PUT', headers: { 'content-type': 'application/json', 'x-admin-key': adminKey }, body: JSON.stringify(state) });
     const d = await r.json();

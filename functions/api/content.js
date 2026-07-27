@@ -28,12 +28,15 @@ export async function onRequestPut({ request, env }) {
 }
 
 // Lets the CMS verify the admin key and whether live persistence is available.
+// "github" (commit-and-rebuild via /api/publish) is the primary, supported
+// live-publish path. "kv" is left as an optional alternative for anyone who
+// later wires up a KV namespace instead — either makes mode.live true.
 export async function onRequestPost({ request, env }) {
   let body = {};
   try { body = await request.json(); } catch {}
   if (body.checkAuth) {
     const ok = !!env.ADMIN_KEY && request.headers.get('x-admin-key') === env.ADMIN_KEY;
-    return Response.json({ ok, kv: !!env.CONTENT });
+    return Response.json({ ok, kv: !!env.CONTENT, github: !!env.GITHUB_TOKEN });
   }
-  return Response.json({ kv: !!env.CONTENT, hasKey: !!env.ADMIN_KEY });
+  return Response.json({ kv: !!env.CONTENT, github: !!env.GITHUB_TOKEN, hasKey: !!env.ADMIN_KEY });
 }
