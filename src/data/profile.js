@@ -12,15 +12,8 @@ const tile = (svgBody, bg = '#101725') =>
   'data:image/svg+xml;utf8,' + encodeURIComponent(
     `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 400"><rect width="640" height="400" fill="${bg}"/>${svgBody}</svg>`
   );
-const msSquares = (x, y, s) =>
-  `<rect x="${x}" y="${y}" width="${s}" height="${s}" fill="#f25022"/><rect x="${x + s + 6}" y="${y}" width="${s}" height="${s}" fill="#7fba00"/><rect x="${x}" y="${y + s + 6}" width="${s}" height="${s}" fill="#00a4ef"/><rect x="${x + s + 6}" y="${y + s + 6}" width="${s}" height="${s}" fill="#ffb900"/>`;
 const THUMBS = {
-  msCeo: tile(`${msSquares(60, 60, 34)}<circle cx="320" cy="205" r="58" fill="none" stroke="#e7c15e" stroke-width="4"/><path d="M300 175 L360 205 L300 235 Z" fill="#e7c15e"/><text x="320" y="330" text-anchor="middle" font-family="Georgia" font-size="34" fill="#f2ecdd">Microsoft on MAF</text>`),
-  mafGpt: tile(`<rect x="170" y="90" width="300" height="150" rx="24" fill="#1d2b4f"/><rect x="170" y="90" width="300" height="150" rx="24" fill="none" stroke="#e7c15e" stroke-width="3"/><text x="320" y="180" text-anchor="middle" font-family="Georgia" font-size="52" fill="#e7c15e">MAF GPT</text><path d="M250 240 L280 240 L255 285 Z" fill="#1d2b4f" stroke="#e7c15e" stroke-width="3"/><text x="320" y="340" text-anchor="middle" font-family="Georgia" font-size="26" fill="#f2ecdd">One of the region's first enterprise GenAI assistants</text>`),
-  teamYear: tile(`<path d="M320 90 L338 150 L400 150 L350 188 L368 250 L320 212 L272 250 L290 188 L240 150 L302 150 Z" fill="#e7c15e"/><text x="320" y="310" text-anchor="middle" font-family="Georgia" font-size="38" fill="#f2ecdd">Team of the Year</text><text x="320" y="348" text-anchor="middle" font-family="Georgia" font-size="24" fill="#b0a894">AI-Driven Transformation</text>`, '#141017'),
-  mafMs: tile(`${msSquares(180, 130, 44)}<text x="320" y="185" text-anchor="middle" font-family="Georgia" font-size="54" fill="#f2ecdd">×</text><text x="440" y="200" text-anchor="middle" font-family="Georgia" font-size="46" fill="#e7c15e">MAF</text><text x="320" y="310" text-anchor="middle" font-family="Georgia" font-size="30" fill="#f2ecdd">Strategic partnership</text>`),
-  wspHiring: tile(`<text x="320" y="190" text-anchor="middle" font-family="Helvetica,Arial" font-weight="bold" font-size="110" fill="#ff372f">WSP</text><text x="320" y="280" text-anchor="middle" font-family="Georgia" font-size="32" fill="#f2ecdd">Growing the Middle East AI team</text>`, '#181a1f'),
-  wspGeo: tile(`<circle cx="320" cy="170" r="70" fill="none" stroke="#e7c15e" stroke-width="3"/><circle cx="320" cy="170" r="46" fill="none" stroke="#e7c15e" stroke-width="2" opacity=".6"/><circle cx="320" cy="170" r="22" fill="#e7c15e" opacity=".85"/><text x="320" y="300" text-anchor="middle" font-family="Helvetica,Arial" font-weight="bold" font-size="52" fill="#ff372f">WSP</text><text x="320" y="345" text-anchor="middle" font-family="Georgia" font-size="26" fill="#f2ecdd">AI × geotechnical engineering</text>`, '#181a1f')
+  wspHiring: tile(`<text x="320" y="190" text-anchor="middle" font-family="Helvetica,Arial" font-weight="bold" font-size="110" fill="#ff372f">WSP</text><text x="320" y="280" text-anchor="middle" font-family="Georgia" font-size="32" fill="#f2ecdd">Growing the Middle East AI team</text>`, '#181a1f')
 };
 
 export const profile = {
@@ -45,7 +38,7 @@ export const profile = {
   stats: [
     { value: 25, suffix: '+', label: 'Years experience' },
     { value: 60000, suffix: '+', label: 'People enabled on AI in the past 4 years' },
-    { value: 8, suffix: '+', label: 'Enterprise AI tools shipped' },
+    { value: 25, suffix: '+', label: 'Enterprise AI tools shipped' },
     { value: 20, prefix: '$', suffix: 'M+', label: 'Programs delivered' }
   ],
 
@@ -176,13 +169,35 @@ export const profile = {
   // items without a url are hidden on the public site until you add the link.
   // Add a thumbnail in the CMS (uploaded images are stored inline) or leave
   // empty for a branded placeholder tile.
+  // Ordered newest-first, matching the Journey section. Dates are the post's
+  // own publication date (decoded from the LinkedIn activity id) and are kept
+  // here as a comment so the ordering stays obvious when items are added.
+  // Thumbnails and the one clip are self-hosted under public/media/ — LinkedIn
+  // CDN URLs carry expiry tokens and would break once they lapse.
   media: [
-    { title: 'MAF × Microsoft partnership', kind: 'post', tag: 'Majid Al Futtaim', desc: 'The strategic partnership announcement on LinkedIn.', url: '', thumb: THUMBS.mafMs },
-    { title: 'MAF GPT launch', kind: 'post', tag: 'Majid Al Futtaim', desc: 'Launching one of the region’s first secure enterprise GenAI assistants.', url: '', thumb: THUMBS.mafGpt },
-    { title: 'Team of the Year, AI-Driven Transformation', kind: 'post', tag: 'Majid Al Futtaim', desc: 'The award recognising the team’s AI-driven transformation.', url: '', thumb: THUMBS.teamYear },
-    { title: 'Microsoft CEO on the MAF partnership', kind: 'video', tag: 'Majid Al Futtaim', desc: 'Microsoft leadership speaking about the MAF AI transformation.', url: '', thumb: THUMBS.msCeo },
+    // 2026-05-22
     { title: 'Hiring the WSP AI team', kind: 'post', tag: 'WSP', desc: 'Growing the Middle East AI engineering and business-partner team.', url: 'https://www.linkedin.com/feed/update/urn:li:activity:7463535335600226304/', thumb: THUMBS.wspHiring },
-    { title: 'AI in geotechnical engineering', kind: 'post', tag: 'WSP', desc: 'WSP at the MENA Geospatial Forum: better decisions, not just more data.', url: 'https://www.linkedin.com/feed/update/urn:li:activity:7481413797270786048/', thumb: THUMBS.wspGeo }
+    // 2025-11-03
+    { title: 'Five ways AI is reshaping the built environment', kind: 'post', tag: 'WSP', desc: 'WSP Middle East insight on predictive maintenance, computer vision, robotics, data centres and autonomous mobility.', url: 'https://www.linkedin.com/feed/update/urn:li:activity:7391043770210897920/', thumb: '/media/wsp-ai-built-environment.jpg' },
+    // 2025-02-13
+    { title: 'WSP × Microsoft: a $1B+ global partnership', kind: 'post', tag: 'WSP', desc: 'Tarek on the seven-year strategic partnership, with Microsoft 365 Copilot expanding across WSP globally.', url: 'https://www.linkedin.com/posts/tarekkaraman_wearewsp-wspvisioneers-activity-7295823032579743744-gD2O', thumb: '/media/wsp-microsoft-partnership.jpg' },
+    // 2025-02-13
+    // Shares the partnership graphic with the card above: this post is the same
+    // announcement from WSP's CEO, and its own video cover frame is an unrelated
+    // caption about another firm, so it is deliberately not used here.
+    { title: 'WSP’s CEO announces the Microsoft partnership', kind: 'video', tag: 'WSP', desc: 'Alexandre L’Heureux, WSP Global CEO, on enabling responsible digital delivery at speed and scale.', url: 'https://www.linkedin.com/feed/update/urn:li:activity:7295792409676828672/', thumb: '/media/wsp-microsoft-partnership.jpg' },
+    // 2024-05-29
+    { title: 'MAF AI Symposium: leadership transformation first', kind: 'post', tag: 'Majid Al Futtaim', desc: 'Naim Yazbeck of Microsoft on the panel with MAF’s group CEO and IBM, with 150+ MAF leaders in the room.', url: 'https://www.linkedin.com/posts/naim-yazbeck_ai-responsible-ai-ugcPost-7201478910096646144-dDUz', thumb: '/media/maf-ai-symposium.jpg' },
+    // 2024-05-29
+    { title: 'Scaling GenAI at Majid Al Futtaim', kind: 'post', tag: 'Majid Al Futtaim', desc: 'Francesco Brenna, VP at IBM Consulting, on the MAF–IBM–Microsoft partnership and mitigating ethical risk.', url: 'https://www.linkedin.com/posts/francesco-brenna_ai-responsible-ai-ugcPost-7201529262611251200-PI-k', thumb: '/media/maf-genai-panel.jpg' },
+    // 2024-03-25
+    { title: 'MAFGPT: a retrieval-augmented legal knowledge base', kind: 'post', tag: 'Majid Al Futtaim', desc: 'Mohamed Tolba on the RAG system built on MAFGPT for document review, contract analysis and legal research.', url: 'https://www.linkedin.com/posts/mohamed-tolba-47b99745_ai-innovation-mafgpt-activity-7177914278081871872-LBV0', thumb: '/media/mafgpt-rag-legal.jpg' },
+    // 2024-03-18
+    { title: 'The GenAI Centre of Excellence, recognised', kind: 'post', tag: 'Majid Al Futtaim', desc: 'Tarek on the team’s award: among the first in MENA to roll out Microsoft Copilot, and MAFGPT built in-house.', url: 'https://www.linkedin.com/posts/tarekkaraman_greatmoments-bold-passionate-activity-7175540926214193155-RvsX', thumb: '/media/maf-genai-coe-award.jpg' },
+    // 2023-11-13
+    { title: 'Microsoft × MAF innovation hub', kind: 'post', tag: 'Majid Al Futtaim', desc: 'Campaign Middle East on the partnership driving retail, real estate and entertainment with Azure analytics and AI.', url: 'https://www.linkedin.com/posts/mohamed-tolba-47b99745_microsoft-and-majid-al-futtaim-set-to-drive-activity-7129719696295161857-N_nO', thumb: '/media/maf-microsoft-hub.png' },
+    // 2023-11-08 — clip hosted locally so it plays inline on the page
+    { title: 'Leading the Copilot & OpenAI 100 rollout', kind: 'video', tag: 'Majid Al Futtaim', desc: 'Tarek on leading the Microsoft Copilot and OpenAI 100 initiative across Majid Al Futtaim.', url: 'https://www.linkedin.com/posts/tarekkaraman_data-ai-activity-7128092402476589056-j7KM', thumb: '/media/maf-copilot-openai100.jpg', video: '/media/maf-copilot-openai100.mp4' }
   ],
 
   linkedinPulse: {
