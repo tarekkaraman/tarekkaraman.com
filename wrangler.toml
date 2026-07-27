@@ -2,11 +2,15 @@
 # Prod is built by Cloudflare Pages' Git integration on every push to `main`,
 # and served at https://tarekkaraman.com. Dev runs locally (npm run dev, :5350).
 #
-# Bindings that must be added in the Cloudflare dashboard (Pages → Settings):
-#   Env vars:  ANTHROPIC_API_KEY  (live Claude concierge)
-#              ADMIN_KEY          (CMS publish password)
-#   KV binding: variable name CONTENT → a KV namespace (live CMS content)
-# These are intentionally NOT committed here (secrets never live in the repo).
+# Secrets to add in the Cloudflare dashboard (Pages → Settings → Environment
+# variables). None of these are committed here, secrets never live in the repo.
+#   ANTHROPIC_API_KEY  live Claude concierge
+#   ADMIN_KEY          CMS login / publish password
+#   GITHUB_TOKEN       lets "Publish live" in the CMS commit straight to this
+#                      repo (functions/api/publish.js), which triggers this
+#                      same Pages build automatically. Fine-grained GitHub PAT,
+#                      scoped to ONLY this repo, Contents: Read and write.
+#                      Create at github.com/settings/personal-access-tokens/new
 
 name = "tarekkaraman-com"
 pages_build_output_dir = "dist"
