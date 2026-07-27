@@ -256,8 +256,9 @@ function renderContent() {
     const r = el('div', 'two');
     r.append(selectField(m, 'kind', 'Type', ['post', 'video', 'article']), textField(m, 'tag', 'Tag (e.g. WSP, Majid Al Futtaim)'));
     card.append(r, textField(m, 'title', 'Title'), textField(m, 'desc', 'One-line description'), textField(m, 'url', 'Link (LinkedIn post, YouTube…) — hidden on the site until set'));
+    card.append(textField(m, 'video', 'Self-hosted clip (e.g. /media/clip.mp4) — plays inline on the card; the thumbnail becomes its poster'));
     card.append(thumbField(m));
-  }, { kind: 'post', tag: '', title: '', desc: '', url: '', thumb: '' }, 'Add media item')));
+  }, { kind: 'post', tag: '', title: '', desc: '', url: '', thumb: '', video: '' }, 'Add media item')));
 
   // LinkedIn pulse
   const lp = state.linkedinPulse;
