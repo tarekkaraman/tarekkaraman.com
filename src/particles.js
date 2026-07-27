@@ -16,19 +16,25 @@ export function initParticles() {
 
   const themeAlpha = () => (document.documentElement.dataset.theme === 'dark' ? 1 : 0.75);
 
+  const makeNode = () => ({
+    x: Math.random() * W,
+    y: Math.random() * H,
+    vx: (Math.random() - 0.5) * 0.22,
+    vy: (Math.random() - 0.5) * 0.22,
+    r: 1 + Math.random() * 1.8,
+    tw: Math.random() * Math.PI * 2 // twinkle phase
+  });
+
   function resize() {
     W = window.innerWidth; H = window.innerHeight;
     canvas.width = W * DPR; canvas.height = H * DPR;
     ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    // Keep the existing field and only top up or trim to the new target. On
+    // mobile, scrolling collapses the URL bar and fires resize constantly;
+    // rebuilding the array there made the whole background visibly jump.
     const target = Math.min(70, Math.round((W * H) / 26000));
-    nodes = Array.from({ length: target }, () => ({
-      x: Math.random() * W,
-      y: Math.random() * H,
-      vx: (Math.random() - 0.5) * 0.22,
-      vy: (Math.random() - 0.5) * 0.22,
-      r: 1 + Math.random() * 1.8,
-      tw: Math.random() * Math.PI * 2 // twinkle phase
-    }));
+    if (nodes.length > target) nodes.length = target;
+    while (nodes.length < target) nodes.push(makeNode());
   }
 
   const LINK = 130;
