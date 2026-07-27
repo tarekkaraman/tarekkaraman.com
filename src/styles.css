@@ -238,7 +238,10 @@ body {
 .chat-chips button { border: 1px solid var(--line); background: transparent; color: var(--text-dim); border-radius: 999px; padding: 6px 14px; font-size: .82rem; cursor: pointer; transition: all .2s; }
 .chat-chips button:hover { color: var(--on-accent); background: var(--grad); border-color: transparent; }
 .chat-input-row { display: flex; gap: 10px; margin-top: 12px; }
-.chat-input-row input { flex: 1; background: var(--bg-2); border: 1px solid var(--line-soft); border-radius: 12px; color: var(--text); padding: 13px 16px; font: inherit; font-size: 1rem; }
+/* min-width:0 — a flex item defaults to min-width:auto and refuses to shrink
+   below its intrinsic width, which pushed the Ask button off-screen at 320px.
+   font-size stays at 1rem/16px so iOS Safari does not zoom in on focus. */
+.chat-input-row input { flex: 1; min-width: 0; background: var(--bg-2); border: 1px solid var(--line-soft); border-radius: 12px; color: var(--text); padding: 13px 16px; font: inherit; font-size: 1rem; }
 .chat-input-row input:focus { outline: none; border-color: var(--accent); }
 .chat-mode { margin: 10px 4px 0; font-size: .74rem; color: var(--text-dim); font-family: var(--font-mono); }
 .typing { display: inline-block; }
@@ -339,7 +342,8 @@ body {
 .vault::before { content: ''; position: absolute; inset: 0; background: var(--grad-soft); opacity: .5; pointer-events: none; }
 .vault > * { position: relative; }
 .vault-form { display: flex; gap: 10px; max-width: 460px; }
-.vault-form input { flex: 1; background: var(--bg-2); border: 1px solid var(--line-soft); border-radius: 12px; color: var(--text); padding: 13px 16px; font: inherit; letter-spacing: .12em; }
+.vault-form { flex-wrap: wrap; }
+.vault-form input { flex: 1 1 180px; min-width: 0; background: var(--bg-2); border: 1px solid var(--line-soft); border-radius: 12px; color: var(--text); padding: 13px 16px; font: inherit; letter-spacing: .12em; }
 .vault-form input:focus { outline: none; border-color: var(--accent); }
 .vault-msg { font-size: .84rem; color: var(--text-dim); margin: 12px 0 0; font-family: var(--font-mono); }
 .vault-msg.err { color: #e0245e; } .vault-msg.ok { color: var(--good); }
@@ -425,8 +429,12 @@ body.recruiter .hero { padding: 64px 22px 44px; }
 
 /* ── Responsive ── */
 .wide-only { display: inline; }
+.narrow-only { display: none; }
 @media (max-width: 900px) {
   .topnav { display: none; }
+  /* The top nav collapses here, so the palette button becomes the only way to
+     move between sections: it is relabelled ☰ so it reads as a menu on touch. */
+  .narrow-only { display: inline; }
   .stats-grid { grid-template-columns: repeat(2, 1fr); }
   .scorecard-strips, .philosophy-grid, .contact-cards, .edu-grid { grid-template-columns: 1fr; }
   .pulse-top { grid-template-columns: 1fr; }
@@ -453,6 +461,57 @@ body.recruiter .hero { padding: 64px 22px 44px; }
   .vault, .chat-shell { padding: 16px; }
   .msg { max-width: 92%; }
   .pulse-items, .media-grid { grid-template-columns: 1fr; }
+}
+
+/* ── Touch devices ── */
+/* Pointer-based fine targets are fine at 22-32px, but a finger needs ~44px
+   (Apple HIG). Applied only where there is no hover, so desktop density is
+   untouched. */
+@media (hover: none) and (pointer: coarse) {
+  .iconbtn, .chip, .pulse-filters button, .chat-suggest button, .pulse-more {
+    min-height: 44px;
+  }
+  .iconbtn { min-width: 44px; }
+  .chat-suggest button, .pulse-filters button { padding-block: 11px; }
+  .pulse-link, .linklike, #pulse-stat a, .media-titlelink {
+    display: inline-block; padding-block: 8px;
+  }
+  /* Cards in the pulse list toggle open on tap, so make that obvious. */
+  .pulse-item { cursor: pointer; }
+}
+
+/* ── Notched / rounded displays ── */
+/* Without these the topbar tucks under the status bar and the chat button can
+   sit on the home indicator in landscape. */
+/* Each rule keeps the side padding this breakpoint already used, and only grows
+   it when the device reports an inset, so spacing is unchanged on flat screens. */
+@supports (padding: env(safe-area-inset-left)) {
+  .topbar-inner {
+    padding-left: max(22px, env(safe-area-inset-left));
+    padding-right: max(22px, env(safe-area-inset-right));
+  }
+  .hero, .section {
+    padding-left: max(22px, env(safe-area-inset-left));
+    padding-right: max(22px, env(safe-area-inset-right));
+  }
+  .chat-fab {
+    right: max(26px, env(safe-area-inset-right));
+    bottom: max(26px, env(safe-area-inset-bottom));
+  }
+  @media (max-width: 560px) {
+    .topbar-inner {
+      padding-left: max(16px, env(safe-area-inset-left));
+      padding-right: max(16px, env(safe-area-inset-right));
+    }
+    .hero, .section {
+      padding-left: max(18px, env(safe-area-inset-left));
+      padding-right: max(18px, env(safe-area-inset-right));
+    }
+    .chat-fab {
+      right: max(16px, env(safe-area-inset-right));
+      bottom: max(16px, env(safe-area-inset-bottom));
+    }
+  }
 }
 
 /* ── Print ── */

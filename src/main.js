@@ -284,7 +284,12 @@ function renderPalette(q = '') {
   });
   return items;
 }
-function openPalette() { overlay.hidden = false; sel = 0; pInput.value = ''; renderPalette(); pInput.focus(); }
+function openPalette() {
+  overlay.hidden = false; sel = 0; pInput.value = ''; renderPalette();
+  // On touch this doubles as the section menu, and autofocusing would raise the
+  // keyboard over the list. Only grab focus where there is a real pointer.
+  if (matchMedia('(hover: hover) and (pointer: fine)').matches) pInput.focus();
+}
 function closePalette() { overlay.hidden = true; }
 $('#palette-btn').addEventListener('click', openPalette);
 overlay.addEventListener('click', (e) => { if (e.target === overlay) closePalette(); });
