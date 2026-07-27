@@ -165,11 +165,28 @@ export function initChat() {
   detectApi();
 }
 
+const escHtml = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+// Renders plain answer text (paragraphs separated by blank lines, optional
+// "• " bulleted lines) as normal, properly-spaced HTML: real <p> and <ul>
+// elements instead of a raw pre-wrap text dump.
+function formatAnswer(text) {
+  const blocks = text.trim().split(/\n\s*\n/);
+  return blocks.map((block) => {
+    const lines = block.split('\n').map((l) => l.trim()).filter(Boolean);
+    if (lines.length && lines.every((l) => l.startsWith('• '))) {
+      return `<ul>${lines.map((l) => `<li>${escHtml(l.slice(2))}</li>`).join('')}</ul>`;
+    }
+    return `<p>${escHtml(lines.join(' '))}</p>`;
+  }).join('');
+}
+
 function addMsg(cls, text, src) {
   const log = $('#chat-log');
   const m = document.createElement('div');
   m.className = `msg ${cls}`;
-  m.textContent = text;
+  if (cls === 'msg-ai' && text) m.innerHTML = formatAnswer(text);
+  else m.textContent = text;
   if (src) {
     const a = document.createElement('a');
     a.href = src; a.className = 'src';
@@ -204,12 +221,5 @@ export async function askChat(q) {
   history.push({ role: 'user', content: q }, { role: 'assistant', content: ans.text });
 
   typing.remove();
-  const m = addMsg('msg-ai', '', ans.src);
-  if (matchMedia('(prefers-reduced-motion: reduce)').matches) { m.prepend(document.createTextNode(ans.text)); return; }
-  const words = ans.text.split(/(\s+)/);
-  let i = 0;
-  const node = document.createTextNode('');
-  m.prepend(node);
-  const tick = () => { node.textContent += words[i++] ?? ''; log.scrollTop = log.scrollHeight; if (i < words.length) setTimeout(tick, 12); };
-  tick();
+  addMsg('msg-ai', ans.text, ans.src);
 }
