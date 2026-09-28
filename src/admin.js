@@ -32,19 +32,19 @@ async function detectMode() {
 }
 
 /* ── Gate ── */
-// In live mode the key is verified server-side against ADMIN_KEY.
-// In file/local mode there is no server, so the editor unlocks with the
-// local editor key below. (Publishing still always goes through git or the
-// server key, which are the real gates.)
-const LOCAL_EDITOR_KEY = '***REMOVED***';
+// In live mode the key is verified server-side against ADMIN_KEY (Cloudflare Pages secret).
+// Without a server (file or local dev) there is no secret to check, so the editor opens only on
+// this computer (localhost or a file) and stays locked on every other host until ADMIN_KEY is set.
+// Never put a password in this file: the repo and the built site are public.
+const isLocalHost = () => location.protocol === 'file:' || ['localhost', '127.0.0.1', '::1', '[::1]', ''].includes(location.hostname);
 async function unlock(key) {
   adminKey = key;
   if (mode.live) {
     const r = await fetch('./api/content', { method: 'POST', headers: { 'content-type': 'application/json', 'x-admin-key': key }, body: JSON.stringify({ checkAuth: true }) });
     const d = await r.json().catch(() => ({}));
     if (!d.ok) return false;
-  } else if (key !== LOCAL_EDITOR_KEY) {
-    return false;
+  } else if (!isLocalHost()) {
+    return false;  // no ADMIN_KEY on this site yet: the editor stays locked
   }
   return true;
 }
@@ -55,7 +55,7 @@ $('#gate-form').addEventListener('submit', async (e) => {
   if (!key) return;
   $('#gate-msg').textContent = 'checking…';
   const ok = await unlock(key);
-  if (!ok) { $('#gate-msg').textContent = '✕ wrong key'; return; }
+  if (!ok) { $('#gate-msg').textContent = mode.live || isLocalHost() ? '✕ wrong key' : '✕ The editor is locked until ADMIN_KEY is set in Cloudflare Pages'; return; }
   sessionStorage.setItem('tk-admin-key', key);
   boot();
 });

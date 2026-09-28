@@ -26,8 +26,8 @@ Add each as type **Secret**, Production environment:
 
 1. **`ANTHROPIC_API_KEY`** — turns on live Claude chat (from console.anthropic.com). Without
    it the concierge still works, using its built-in fact-lookup instead of live Claude.
-2. **`ADMIN_KEY`** — your CMS login/publish password. Set it to `***REMOVED***` to match
-   what already works when the CMS is in local mode.
+2. **`ADMIN_KEY`** — your CMS login/publish password. Choose a NEW, strong password that you use nowhere
+   else (let your password manager generate it). Never write it in this repo — the repo is public.
 3. **`GITHUB_TOKEN`** — this is what makes **"Publish live" in the CMS actually work with
    no GitHub involved on your end.** Clicking Publish commits the change straight to this
    repo behind the scenes, which is what triggers Cloudflare to rebuild the site (~30-90s).
