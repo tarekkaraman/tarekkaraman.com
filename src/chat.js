@@ -22,12 +22,12 @@ const starterChips = [
 const topics = () => [
   {
     keys: ['scale', 'scope', 'size', 'budget', 'p&l', 'pnl', 'how big', 'numbers', 'users', 'impact', 'results'],
-    answer: `Scale is the through-line of Tarek's career:\n\n• Rolled out Microsoft Copilot across WSP's Middle East region\n• 25+ enterprise AI tools shipped across Majid Al Futtaim and WSP, including 8+ at WSP within six months of standing up the AI Accelerator\n• Client AI programs grown from pilots to multi-year engagements valued at $20M+\n• A dedicated AI engineering delivery centre built and scaled from zero\n• Earlier: 15X revenue growth in year one at Solve IT, and a 100+ person technical team at his own venture`,
+    answer: `Scale is the through-line of Tarek's career:\n\n• Rolled out Microsoft Copilot across WSP's Middle East region\n• 25+ enterprise AI tools shipped across Majid Al Futtaim and WSP, including 8+ at WSP within six months of standing up the AI Accelerator\n• Client AI programs grown from pilots into multi-year engagements\n• A dedicated AI engineering delivery centre built and scaled from zero\n• Earlier: 15X revenue growth in year one at Solve IT, and a 100+ person technical team at his own venture`,
     src: '#scorecard'
   },
   {
     keys: ['team', 'hire', 'hiring', 'build ai team', 'organisation', 'organization', 'delivery centre', 'delivery center', 'people', 'talent'],
-    answer: `Tarek builds AI organisations, not just AI projects. At WSP he stood up a dedicated AI engineering delivery centre, hiring the team and designing the operating model that ships AI products across internal and client programs. He founded the AI Academy (training hundreds of staff), and he's actively growing the team now, his recent LinkedIn activity is largely hiring posts for AI business partners and AI-first specialists. At Majid Al Futtaim he founded and scaled two Centres of Excellence. Earlier he managed 100+ technical staff at his own company.`,
+    answer: `Tarek builds AI organisations, not just AI projects. At WSP he stood up a dedicated AI engineering delivery centre, hiring the team and designing the operating model that ships AI products across internal and client programs. He drives AI literacy across the whole business, not just specialists, and he's actively growing the team now; his recent LinkedIn activity is largely hiring posts for AI business partners and AI-first specialists. At Majid Al Futtaim he founded and scaled two Centres of Excellence. Earlier he managed 100+ technical staff at his own company.`,
     src: '#pulse'
   },
   {
@@ -37,7 +37,7 @@ const topics = () => [
   },
   {
     keys: ['tools', 'shipped', 'built', 'products', 'enterprise ai tools', 'bid', 'automation', 'what has he made'],
-    answer: `Across Majid Al Futtaim and WSP, Tarek has shipped 25+ enterprise AI tools. Within six months of standing up WSP's AI Accelerator his team shipped 8+ of them: bid automation, resourcing, data insights and project planning, improving bid-win rates and cutting delivery effort. On the client side: AI-powered water management, city digital twins and environmental simulation platforms, grown from pilots into multi-year programs valued at $20M+. At MAF he launched MAF GPT, a secure internal generative-AI assistant, plus a region-leading Microsoft Copilot deployment.`,
+    answer: `Across Majid Al Futtaim and WSP, Tarek has shipped 25+ enterprise AI tools. Within six months of standing up WSP's AI Accelerator his team shipped 8+ of them: bid automation, resourcing, data insights and project planning, improving bid-win rates and cutting delivery effort. On the client side: AI-powered water management, city digital twins and environmental simulation platforms, grown from pilots into multi-year programs. At MAF he launched MAF GPT, a secure internal generative-AI assistant, plus a region-leading Microsoft Copilot deployment.`,
     src: '#journey'
   },
   {
@@ -52,7 +52,7 @@ const topics = () => [
   },
   {
     keys: ['governance', 'ethics', 'risk', 'compliance', 'responsible', 'guardrail', 'legal', 'safe'],
-    answer: `Governance is one of Tarek's differentiators. He founded WSP's AI Academy and embedded ethical and legal guardrails into every AI deployment, which is precisely what allowed a region-wide Copilot rollout to stay compliant with global frameworks. His earlier work includes digital governance projects for Dubai Health Authority, Smart Dubai, ARAMCO and ADDED. His view: compliance done right speeds adoption, it doesn't slow it.`,
+    answer: `Governance is one of Tarek's differentiators. He uplifts AI literacy across the business and embeds ethical and legal guardrails into every AI deployment, which is precisely what allowed a region-wide Copilot rollout to stay compliant with global frameworks. His earlier work includes digital governance projects for Dubai Health Authority, Smart Dubai, ARAMCO and ADDED. His view: compliance done right speeds adoption, it doesn't slow it.`,
     src: '#leadership'
   },
   {
@@ -167,6 +167,16 @@ export function initChat() {
 
 const escHtml = (s) => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
+// Long single paragraphs read as one wall of text in a chat bubble, so break
+// them into short paragraphs of ~2 sentences each.
+function splitLongParagraph(text) {
+  if (text.length < 260) return [text];
+  const sentences = text.match(/[^.!?]+[.!?]+(?=\s|$)|[^.!?]+$/g) || [text];
+  const paras = [];
+  for (let i = 0; i < sentences.length; i += 2) paras.push(sentences.slice(i, i + 2).join('').trim());
+  return paras;
+}
+
 // Renders plain answer text (paragraphs separated by blank lines, optional
 // "• " bulleted lines) as normal, properly-spaced HTML: real <p> and <ul>
 // elements instead of a raw pre-wrap text dump.
@@ -177,8 +187,15 @@ function formatAnswer(text) {
     if (lines.length && lines.every((l) => l.startsWith('• '))) {
       return `<ul>${lines.map((l) => `<li>${escHtml(l.slice(2))}</li>`).join('')}</ul>`;
     }
-    return `<p>${escHtml(lines.join(' '))}</p>`;
+    return splitLongParagraph(lines.join(' ')).map((p) => `<p>${escHtml(p)}</p>`).join('');
   }).join('');
+}
+
+// Keep the start of a new answer in view. Jumping to the very bottom of the
+// log meant a long answer opened on its last lines, hiding where it began.
+function scrollToMsg(m) {
+  const log = $('#chat-log');
+  log.scrollTop += m.getBoundingClientRect().top - log.getBoundingClientRect().top - 8;
 }
 
 function addMsg(cls, text, src) {
@@ -193,7 +210,8 @@ function addMsg(cls, text, src) {
     a.textContent = `→ see ${src.replace('#', '').replace('-section', '')} section`;
     m.append(a);
   }
-  log.append(m); log.scrollTop = log.scrollHeight;
+  log.append(m);
+  if (cls === 'msg-ai') scrollToMsg(m); else log.scrollTop = log.scrollHeight;
   return m;
 }
 

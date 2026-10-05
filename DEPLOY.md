@@ -19,6 +19,11 @@ on Pages preview URLs, and on the GitHub Pages subpath with no code change.
 - [x] Custom domain live with SSL
 - [ ] Three secrets below, added in the dashboard (each is a paste, no coding)
 - [ ] Change the Deeper Dive / References keys from the placeholders before sharing
+- [ ] **Make `www.tarekkaraman.com` work** (currently doesn't resolve). In the Pages project →
+      Custom domains → add `www.tarekkaraman.com`, then Rules → Redirect Rules → new rule:
+      hostname equals `www.tarekkaraman.com` → static redirect to
+      `https://tarekkaraman.com${http.request.uri.path}` (301, preserve query string).
+      Pages' `_redirects` file can't do this, it only handles paths on the same host.
 
 ## The three secrets (Cloudflare dashboard → your Pages project → Settings → Environment variables)
 

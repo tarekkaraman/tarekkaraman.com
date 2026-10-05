@@ -61,7 +61,7 @@ export const profile = {
     { value: 25, suffix: '+', label: 'Years experience' },
     { value: 60000, suffix: '+', label: 'People enabled on AI in the past 4 years' },
     { value: 25, suffix: '+', label: 'Enterprise AI tools shipped' },
-    { value: 20, prefix: '$', suffix: 'M+', label: 'Programs delivered' }
+    { text: 'Pilot → Program', label: 'Client AI work grown into multi-year engagements' }
   ],
 
   experience: [
@@ -75,8 +75,8 @@ export const profile = {
         'Established the ME AI Accelerator and a dedicated AI engineering delivery centre',
         'Deployed 8+ enterprise AI tools within six months across bid, resourcing, insights and planning',
         'Rolled out Microsoft Copilot across the region',
-        'Directed client AI programs from pilots to multi-year engagements valued at $20M+',
-        'Founded the AI Academy and embedded ethical and legal guardrails into every deployment'
+        'Directed client AI programs from pilots to multi-year engagements',
+        'Uplifted AI literacy across the business and embedded ethical and legal guardrails into every deployment'
       ],
       more: true // has additional detail behind the Deeper Dive key
     },
@@ -172,7 +172,7 @@ export const profile = {
     { title: 'Governance is an enabler', body: 'Ethical and legal guardrails embedded from day one are what let a whole region adopt AI without incident. Compliance done right speeds adoption; it doesn’t slow it.' },
     { title: 'Adoption is the product', body: 'A deployed tool nobody uses is a cost. I measure success in changed ways of working, so enablement, training, and executive sponsorship are engineered, not hoped for.' },
     { title: 'Partner at the top', body: 'Microsoft, IBM, Google, PwC. The fastest route to enterprise-grade AI is pairing internal capability with the ecosystem’s best, on commercial terms that work.' },
-    { title: 'Commercial outcomes', body: 'Bid-win rates, delivery effort, revenue growth, $20M+ programs. Technology strategy only matters when it lands on the P&L.' },
+    { title: 'Commercial outcomes', body: 'Bid-win rates, delivery effort, revenue growth, pilots that become long-term programs. Technology strategy only matters when it lands on the P&L.' },
     { title: 'Build teams that outlast you', body: 'From 100+ technical staff at my own venture to WSP’s AI delivery hub, hiring, mentoring and operating models are the real legacy of any leadership role.' }
   ],
 
@@ -180,7 +180,7 @@ export const profile = {
   // knowledgeBase list below is free-form and fully editable (add sources,
   // reference material, corrections; every entry is fed to the AI).
   deepKnowledge: {
-    wsp: `At WSP (2024 to present) Tarek is the AI & Innovation Leader for the Middle East, contributing to WSP's global enterprise AI delivery. WSP is a global professional-services and engineering firm; the Middle East business alone has 500,000+ LinkedIn followers. Tarek built the region's AI function from zero: the ME AI Accelerator (framework and delivery model), a dedicated AI engineering delivery centre (hiring the team and operating model), and the AI Academy for capability building. Within six months the Accelerator shipped 8+ enterprise AI tools spanning bid automation, resourcing, data insights and project planning, improving bid-win rates and cutting delivery effort. On the client side he has directed AI initiatives in AI-powered water management, city digital twins and environmental simulation, growing them from pilots into multi-year programs valued at $20M+. He rolled out Microsoft Copilot across the region with compliance under global governance frameworks. He is actively hiring AI business partners and AI-first specialists across the region.`,
+    wsp: `At WSP (2024 to present) Tarek is the AI & Innovation Leader for the Middle East, contributing to WSP's global enterprise AI delivery. WSP is a global professional-services and engineering firm; the Middle East business alone has 500,000+ LinkedIn followers. Tarek built the region's AI function from zero: the ME AI Accelerator (framework and delivery model), a dedicated AI engineering delivery centre (hiring the team and operating model), and an AI literacy uplift so everyone in the business, not just specialists, can use AI well. Within six months the Accelerator shipped 8+ enterprise AI tools spanning bid automation, resourcing, data insights and project planning, improving bid-win rates and cutting delivery effort. On the client side he has directed AI initiatives in AI-powered water management, city digital twins and environmental simulation, growing them from pilots into multi-year programs. He rolled out Microsoft Copilot across the region with compliance under global governance frameworks. He is actively hiring AI business partners and AI-first specialists across the region.`,
     maf: `At Majid Al Futtaim (2022 to 2024), the retail, leisure and real-estate group behind Mall of the Emirates, City Centre malls, Carrefour in the region and VOX Cinemas, Tarek was Technology & Innovation Lead. He founded and scaled two Centres of Excellence (Generative AI and RPA), making MAF one of the region's earliest enterprise adopters of generative AI. He launched MAF GPT (a secure internal generative-AI assistant) and led one of the region's earliest large-scale Microsoft Copilot deployments. He secured strategic partnerships with Microsoft, IBM, PwC and Google, and directed a regional GenAI Symposium featuring Microsoft, IBM and Gartner. His team won 'Team of the Year' for AI-driven transformation and he was recognised personally by both Microsoft and MAF group CEOs.`
   },
   knowledgeBase: [
@@ -251,7 +251,7 @@ export const profile = {
   interests: [
     'Builds, doesn\'t just sponsor: this site was engineered end-to-end with AI under his direction. Proof of concept, not a slide deck.',
     'Founds things that didn\'t exist: a digital music-publishing platform in 2006, enterprise AI accelerators today. Same instinct, different decade.',
-    'Trains the next generation: founded WSP\'s AI Academy and put hundreds of professionals through it. The teams he leaves behind are the real legacy.'
+    'Lifts everyone, not just specialists: drives AI literacy across whole organisations so every team can use AI well. The capability he leaves behind is the real legacy.'
   ],
 
   // Framing for the key-gated area.

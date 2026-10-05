@@ -62,9 +62,11 @@ function render(profile) {
   /* Scorecard */
   const statsGrid = $('#stats-grid');
   profile.stats.forEach((s) => {
-    const card = el('div', 'stat');
-    card.append(el('b', null, `<span class="g">${s.prefix || ''}0${s.suffix || ''}</span>`), el('span', null, esc(s.label)));
-    card.dataset.value = s.value; card.dataset.prefix = s.prefix || ''; card.dataset.suffix = s.suffix || '';
+    // A stat with `text` shows that phrase as-is instead of a counted number.
+    const card = el('div', s.text ? 'stat stat-text' : 'stat');
+    const shown = s.text ? esc(s.text) : `${s.prefix || ''}0${s.suffix || ''}`;
+    card.append(el('b', null, `<span class="g">${shown}</span>`), el('span', null, esc(s.label)));
+    if (!s.text) { card.dataset.value = s.value; card.dataset.prefix = s.prefix || ''; card.dataset.suffix = s.suffix || ''; }
     statsGrid.append(card);
   });
   const partnersStrip = $('#partners-strip');
@@ -231,6 +233,7 @@ function render(profile) {
 }
 
 function animateStat(card) {
+  if (card.classList.contains('stat-text')) return;
   const target = Number(card.dataset.value);
   const g = card.querySelector('.g');
   const dur = 1400, t0 = performance.now();

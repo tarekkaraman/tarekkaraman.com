@@ -218,7 +218,9 @@ function renderContent() {
   p.append(group('Scorecard stats', cardList(state.stats, (card, s) => {
     const row = el('div', 'three');
     row.append(textField(s, 'value', 'Value', { type: 'number' }), textField(s, 'prefix', 'Prefix'), textField(s, 'suffix', 'Suffix'));
-    card.append(row, textField(s, 'label', 'Label'));
+    card.append(row,
+      textField(s, 'text', 'Or show text instead of a number', { sub: 'e.g. "Pilot → Program". When filled, the number fields above are ignored.' }),
+      textField(s, 'label', 'Label'));
   }, { value: 0, prefix: '', suffix: '', label: '' }, 'Add stat')));
 
   // Experience

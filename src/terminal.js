@@ -35,7 +35,7 @@ function run(cmd) {
     case 'ls': return Object.keys(F).join('\n');
     case 'cat': return F[arg] || `cat: ${arg || '<file>'}: No such file`;
     case 'whoami': return `${profile.name}, ${profile.headline}\n${profile.role}`;
-    case 'stats': return profile.stats.map((s) => `${(s.prefix || '') + s.value.toLocaleString('en-US') + (s.suffix || '')}  ${s.label}`).join('\n');
+    case 'stats': return profile.stats.map((s) => `${s.text || (s.prefix || '') + Number(s.value).toLocaleString('en-US') + (s.suffix || '')}  ${s.label}`).join('\n');
     case 'sudo': return arg === 'hire' ? `[sudo] password for recruiter: ********\nPrivileges granted. Next step: ${profile.email}` : `sudo: ${arg}: command not found`;
     case 'clear': $('#terminal-body').textContent = ''; return null;
     case 'exit': closeTerminal(); return null;
